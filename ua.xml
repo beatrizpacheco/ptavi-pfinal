@@ -1,6 +1,6 @@
 <config>
     <account username="nombre usuario" passwd="contraseña" />
-    <uaserver ip="127.0.0.1" puerto="puerto uaserver" />
+    <uaserver ip="127.0.0.1" puerto="6000" />
     <rtpaudio puerto="puerto recepcion rtp" />
     <regproxy ip= "127.0.0.1" puerto="6001" />
     <log path="localizacion fichero log"/>

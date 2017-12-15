@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Programa uaclient
@@ -32,11 +32,11 @@ class UAClientHandler(ContentHandler):
     def get_tags(self):
         return(self.config)
         
-    def elparser():
+    def elparser(fich):
         parser = make_parser()
         cHandler = UAClientHandler()
         parser.setContentHandler(cHandler)
-        parser.parse(open(CONFIG))
+        parser.parse(open(fich))
         #confdict = cHandler.get_tags()
         cHandler.get_tags()
 
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     CONFIG = sys.argv[1]
     METHOD = sys.argv[2] #  Error si no es un metodo sip
     OPCION = sys.argv[3]
-    UAClientHandler.elparser()
+    UAClientHandler.elparser(CONFIG)
     IP_PROXY = UAClientHandler.config['regproxy_ip']
     PORT_PROXY = int(UAClientHandler.config['regproxy_puerto'])
     

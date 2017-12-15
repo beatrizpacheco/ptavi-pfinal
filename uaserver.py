@@ -9,17 +9,28 @@ import socketserver
 import sys
 from uaclient import UAClientHandler
 
+class EchoHandler(socketserver.DatagramRequestHandler):
+    """
+    Echo server class
+    """
+    pass
+
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        sys.exit('Usage: python3 uaserver.py config')
+
+    CONFIG = sys.argv[1]
+    UAClientHandler.elparser(CONFIG)
+    print(UAClientHandler.get_tags(UAClientHandler))
+    
     IP_UASERVER = UAClientHandler.config['uaserver_ip']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
-    if len(sys.argv) < 2:
-        print('Usage: python3 uaserver.py config')
-    UAClientHandler.elparser()
+    
     #Servidor de eco y escuchamos
-    SERV = socketserver.UDPServer((IP_UASERVER, PORT_UASERVER))
+    SERV = socketserver.UDPServer((IP_UASERVER, PORT_UASERVER), EchoHandler)
     print('listening...')
     try:
-        serv.serve_forever()
+        SERV.serve_forever()
     except KeyboardInterrupt:
         print('servidor finalizado')
 
