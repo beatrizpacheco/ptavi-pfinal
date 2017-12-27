@@ -20,8 +20,8 @@ if __name__ == "__main__":
         sys.exit('Usage: python3 uaserver.py config')
 
     CONFIG = sys.argv[1]
-    UAClientHandler.elparser(CONFIG)
-    print(UAClientHandler.get_tags(UAClientHandler))
+    print(UAClientHandler.elparser(CONFIG))
+#    print(UAClientHandler.get_tags(UAClientHandler))
     
     IP_UASERVER = UAClientHandler.config['uaserver_ip']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])

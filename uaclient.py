@@ -48,18 +48,40 @@ if __name__ == "__main__":
     CONFIG = sys.argv[1]
     METHOD = sys.argv[2] #  Error si no es un metodo sip
     OPCION = sys.argv[3]
-    UAClientHandler.elparser(CONFIG)
+    print(UAClientHandler.elparser(CONFIG))
+    #el print no estaba, pero tengo que comprobar si el parser me devuelve el diccionario o no!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     IP_PROXY = UAClientHandler.config['regproxy_ip']
     PORT_PROXY = int(UAClientHandler.config['regproxy_puerto'])
-    
+    USER = UAClientHandler.config['account_username']
+    PORT_UASERVER = UAClientHandler.config['uaserver_puerto']
+    RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
     # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto 
     # del servidor regproxy
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         my_socket.connect((IP_PROXY, PORT_PROXY))
 
-        if METHOD == 'INVITE' or METHOD == 'BYE':
-            my_socket.send(bytes(METHOD + ' sip:' + MESSAGE.split(':')[0] +
+        if METHOD == 'REGISTER':
+            my_socket.send(bytes(METHOD + ' sip:' + USER + ':' +
+                                 PORT_UASERVER + ' SIP/2.0\r\nExpires: ' + 
+                                 OPCION + '\r\n\r\n', 'utf-8') 
+                                 + b'\r\n')
+        #PUERTO Y OPCION HAY QUE PASARLOS A STR?
+        #DESPUES DE ESTO ME ENVIARÁN UN MENSAJE DE AUTENTICACION
+        if METHOD == 'INVITE':
+            my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
+                                 ' SIP/2.0\r\nContent-Type: application/sdp' + 
+                                 '\r\n\r\n' + 
+                                 'v=0\r\n' + 
+                                 'o=' + USER + '\r\n' +
+                                 's=misesion\r\n' +
+                                 't=0\r\n' +
+                                 'm=audio ' + RTPAUDIO + ' RTP\r\n',
+                                 'utf-8') + b'\r\n')
+        
+        
+        if METHOD == 'BYE':
+            my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
                                  ' SIP/2.0\r\n', 'utf-8') + b'\r\n')
 """
         DATA = my_socket.recv(1024)
