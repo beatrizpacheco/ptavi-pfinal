@@ -34,11 +34,10 @@ class UAClientHandler(ContentHandler):
         
     def elparser(fich):
         parser = make_parser()
-        cHandler = UAClientHandler()
-        parser.setContentHandler(cHandler)
+        uaHandler = UAClientHandler()
+        parser.setContentHandler(uaHandler)
         parser.parse(open(fich))
-        #confdict = cHandler.get_tags()
-        cHandler.get_tags()
+        return(uaHandler.get_tags())
 
 if __name__ == "__main__":
 
@@ -49,12 +48,17 @@ if __name__ == "__main__":
     METHOD = sys.argv[2] #  Error si no es un metodo sip
     OPCION = sys.argv[3]
     print(UAClientHandler.elparser(CONFIG))
-    #el print no estaba, pero tengo que comprobar si el parser me devuelve el diccionario o no!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    IP_PROXY = UAClientHandler.config['regproxy_ip']
+    
+    #Doy valor a las variables segun la info del xml
+    if UAClientHandler.config["regproxy_ip"] == None:
+        IP_PROXY = "127.0.0.1"
+    else:
+        IP_PROXY = UAClientHandler.config['regproxy_ip']
     PORT_PROXY = int(UAClientHandler.config['regproxy_puerto'])
     USER = UAClientHandler.config['account_username']
     PORT_UASERVER = UAClientHandler.config['uaserver_puerto']
     RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
+    
     # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto 
     # del servidor regproxy
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
@@ -84,7 +88,7 @@ if __name__ == "__main__":
             my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
                                  ' SIP/2.0\r\n', 'utf-8') + b'\r\n')
 """
-        DATA = my_socket.recv(1024)
+        data = my_socket.recv(1024)
         print('Recibido -- ', data.decode('utf-8'))
         MESSAGE_RECEIVE = data.decode('utf-8').split(' ')
         for element in message_receive:

@@ -21,7 +21,6 @@ if __name__ == "__main__":
 
     CONFIG = sys.argv[1]
     print(UAClientHandler.elparser(CONFIG))
-#    print(UAClientHandler.get_tags(UAClientHandler))
     
     IP_UASERVER = UAClientHandler.config['uaserver_ip']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
