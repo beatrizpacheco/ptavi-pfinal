@@ -1,0 +1,5 @@
+<config>
+    <server name="SuperServidor" ip="127.0.0.1" puerto="12345" />
+    <database path="ruta bd" passwdpath="ruta pwd" />
+    <log path="ruta fichero log" />
+</config>
