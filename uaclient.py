@@ -4,6 +4,7 @@
 Programa uaclient
 """
 
+import os
 import socket
 import sys
 from xml.sax import make_parser
@@ -45,6 +46,8 @@ if __name__ == "__main__":
         sys.exit('Usage: python3 uaclient.py config method opcion')
 
     CONFIG = sys.argv[1]
+    if not os.path.exists(CONFIG):
+        sys.exit("Config_file doesn't exists")
     METHOD = sys.argv[2] #  Error si no es un metodo sip
     OPCION = sys.argv[3]
     print(UAClientHandler.elparser(CONFIG))
@@ -56,7 +59,7 @@ if __name__ == "__main__":
         IP_PROXY = UAClientHandler.config['regproxy_ip']
     PORT_PROXY = int(UAClientHandler.config['regproxy_puerto'])
     USER = UAClientHandler.config['account_username']
-    PORT_UASERVER = UAClientHandler.config['uaserver_puerto']
+    PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
     RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
     
     # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto 
@@ -65,14 +68,12 @@ if __name__ == "__main__":
         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         my_socket.connect((IP_PROXY, PORT_PROXY))
 
-        if METHOD == 'REGISTER':
+        if (METHOD == 'REGISTER' or METHOD == 'register'):
             my_socket.send(bytes(METHOD + ' sip:' + USER + ':' +
-                                 PORT_UASERVER + ' SIP/2.0\r\nExpires: ' + 
-                                 OPCION + '\r\n\r\n', 'utf-8') 
-                                 + b'\r\n')
-        #PUERTO Y OPCION HAY QUE PASARLOS A STR?
+                                 str(PORT_UASERVER) + ' SIP/2.0\r\nExpires: ' +
+                                 OPCION + '\r\n\r\n', 'utf-8') + b'\r\n')
         #DESPUES DE ESTO ME ENVIARÁN UN MENSAJE DE AUTENTICACION
-        if METHOD == 'INVITE':
+        if (METHOD == 'INVITE' or METHOD == 'invite'):
             my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
                                  ' SIP/2.0\r\nContent-Type: application/sdp' + 
                                  '\r\n\r\n' + 
@@ -84,7 +85,7 @@ if __name__ == "__main__":
                                  'utf-8') + b'\r\n')
         
         
-        if METHOD == 'BYE':
+        if (METHOD == 'BYE' or METHOD == 'bye'):
             my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
                                  ' SIP/2.0\r\n', 'utf-8') + b'\r\n')
 """
