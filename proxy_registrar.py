@@ -46,6 +46,47 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
     """
     Aquí iría la movida del log y de echar a los clientes expirados#############
     """
+    """def json2registered(self):
+        """"""
+        method to view clients of database
+        """"""
+        try:
+            with open('registered.json', 'r') as fich:
+                self.dic_users = json.load(fich)
+                self.expired()
+        except (NameError, FileNotFoundError):
+            pass
+    ESTO SERÍA PARA EL OPCIONAL DE LEER DEL FICHERO        
+    """
+
+    def WriteDatabase(self, path):
+        """
+        method to save the users in the database
+        """
+        self.expired()
+        fich = open(path, "w")
+    
+        for user in self.dic_users:
+            line = (user + ', ' + self.dic_users[user][0] + ', ' + 
+                   str(self.dic_users[user][1]) + ', ' +
+                   self.dic_users[user][2] + ', ' + 
+                   self.dic_users[user][3] + '\r\n')
+            fich.write(line)
+
+    
+    def expired(self):
+        """
+        method to check expiration of users
+        """
+        expired_users = []
+        current_hour = time.strftime('%Y-%m-%d %H:%M:%S',
+                                     time.gmtime(time.time()))
+        for user in self.dic_users:
+            if self.dic_users[user][3] < current_hour:
+                expired_users.append(user)
+        for user in expired_users:
+            del self.dic_users[user]
+    
     def user_register(self, fich):
         """
         Comprueba si usuario registrado o no
@@ -57,20 +98,25 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
         handle method of the server class
         (all requests will be handled by this method)
         """
+        #self.json2registered()
         for line in self.rfile:
             message = line.decode('utf-8').split()
             if message and (message[0] == 'REGISTER' or
                             message[0] == 'register'):
                 print('recibo un register')
-                user = message[1][4:]
+                user = message[1].split(':')[1]
                 ip_address = self.client_address[0]
+                port_address = self.client_address[1]
             if message and message[0] == 'Expires:':
                 print('linea del expires')
                 if message[1] != '0':
-                    expire = time.strftime('%Y-%m-%d %H:%M:%S',
-                                           time.gmtime(time.time() +
-                                                       int(message[1])))
-                    self.dic_users[user] = [ip_address, expire]
+                    time_regist = time.strftime('%Y-%m-%d %H:%M:%S',
+                                                  time.gmtime(time.time()))
+                    expire =  time.strftime('%Y-%m-%d %H:%M:%S',
+                                            time.gmtime(time.time() +
+                                            int(message[1])))
+                    self.dic_users[user] = [ip_address, port_address,
+                                            time_regist, expire]
                     self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                 elif message[1] == '0':
                     try:
@@ -86,6 +132,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                 #abro socket con el cliente y le envio el mensaje
             #print(line.decode('utf-8'), end='')
         print(self.dic_users)
+        self.WriteDatabase(DB_PATH)
         
 
 if __name__ == "__main__":
