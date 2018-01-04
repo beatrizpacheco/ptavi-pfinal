@@ -4,6 +4,7 @@
 Programa uaclient
 """
 
+import hashlib
 import os
 import socket
 import sys
@@ -40,6 +41,20 @@ class UAClientHandler(ContentHandler):
         parser.parse(open(fich))
         return(uaHandler.get_tags())
 
+def checking(nonce):
+    """
+    method to get the number result of hash function
+    with password and nonce
+    """
+    function_check = hashlib.md5()
+    function_check.update(bytes(str(nonce), "utf-8"))#NO SE SI EL NONCE HAY QUE PASARLO A STRING O NO
+    print('EL PUTO NONCE ES : ' + str(nonce)) #COMPROBACION
+    function_check.update(bytes(str(PASSWORD), "utf-8"))
+    print('LA CONTRASEÑA ES : ' + str(PASSWORD)) #COMPROBACION
+    #function_check.digest() #no sé si esto hace falta o directamente hex
+    print('RESPONSE CLIENT: ' + function_check.hexdigest()) #COMPROBACION
+    return function_check.hexdigest()
+
 if __name__ == "__main__":
 
     if len(sys.argv) != 4:
@@ -59,6 +74,7 @@ if __name__ == "__main__":
         IP_PROXY = UAClientHandler.config['regproxy_ip']
     PORT_PROXY = int(UAClientHandler.config['regproxy_puerto'])
     USER = UAClientHandler.config['account_username']
+    PASSWORD = UAClientHandler.config['account_passwd']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
     RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
     
@@ -67,11 +83,13 @@ if __name__ == "__main__":
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         my_socket.connect((IP_PROXY, PORT_PROXY))
-
+        
         if (METHOD == 'REGISTER' or METHOD == 'register'):
             my_socket.send(bytes(METHOD + ' sip:' + USER + ':' +
                                  str(PORT_UASERVER) + ' SIP/2.0\r\nExpires: ' +
                                  OPCION + '\r\n\r\n', 'utf-8') + b'\r\n')
+            print(METHOD + ' sip:' + USER + ':' + str(PORT_UASERVER) + 
+                  ' SIP/2.0\r\nExpires: ' + OPCION + '\r\n\r\n') #COMPROBACION
         #DESPUES DE ESTO ME ENVIARÁN UN MENSAJE DE AUTENTICACION
         if (METHOD == 'INVITE' or METHOD == 'invite'):
             my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
@@ -88,15 +106,30 @@ if __name__ == "__main__":
         if (METHOD == 'BYE' or METHOD == 'bye'):
             my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
                                  ' SIP/2.0\r\n', 'utf-8') + b'\r\n')
-"""
-        data = my_socket.recv(1024)
-        print('Recibido -- ', data.decode('utf-8'))
-        MESSAGE_RECEIVE = data.decode('utf-8').split(' ')
-        for element in message_receive:
-            if METHOD != 'BYE' and element == '200':
-                my_socket.send(bytes('ACK sip:' + MESSAGE.split(':')[0] +
-                                     ' SIP/2.0\r\n', 'utf-8') + b'\r\n')
-        print("Terminando socket...")
 
+        #try:
+        data = my_socket.recv(1024)
+        print('Recibido -- ' + data.decode('utf-8'))
+        MESSAGE_RECEIVE = data.decode('utf-8').split()
+        if '401' in MESSAGE_RECEIVE:
+            nonce = MESSAGE_RECEIVE[6].split('=')[1][1:-1]
+            print('EL PUTO NONCE de abajo ES : ' + str(nonce)) #COMPROBACION
+            response = checking(nonce)
+            my_socket.send(bytes(METHOD + ' sip:' + USER + ':' +
+                                 str(PORT_UASERVER) + ' SIP/2.0\r\nExpires: ' +
+                                 OPCION + '\r\n' + 
+                                 'Authorization: Digest response="' + 
+                                 response + '"\r\n\r\n', 'utf-8'))
+        """
+        for element in MESSAGE_RECEIVE:
+            if METHOD != 'BYE' and element == '200':
+                my_socket.send(bytes('ACK sip:' +
+                                     ' SIP/2.0\r\n', 'utf-8') + b'\r\n')
+                #FALTA PONER BIEN ESTE MENSAJEEE
+        """
+        print("Terminando socket...")
+        #except ConnectionRefusedError:
+        #    exit("Error: no server listening at " + IP_PROXY +  " port " + str(PORT_PROXY))
+            #LUEGO ESCRIBIR ESTO EN EL LOG
     print("Fin.")
-"""
+

@@ -41,6 +41,7 @@ class ProxyHandler(ContentHandler):
 
 def fich_passwords(user):
     with open(PSSWD_PATH, "r") as fich:
+        psswd = None #ESTO NO SE SI ESTA BIEN O HAY QUE QUITARLO
         for line in fich:
             user_fich = line.split(' ')[1]
             if user == user_fich:
@@ -54,9 +55,12 @@ def checking(nonce_user, user):
     with password and nonce
     """
     function_check = hashlib.md5()
-    function_check.update(bytes(nonce_user, "utf-8"))
+    function_check.update(bytes(str(nonce_user), "utf-8"))#NO SE SI HACE FALTA PASAR A STRING
+    print('EL PUTO NONCE ES : ' + nonce_user) #COMPROBACION
     function_check.update(bytes(fich_passwords(user), "utf-8"))
-    function_check.digest() #no sé si esto hace falta o directamente hex
+    print('LA CONTRASEÑA ES : ' + fich_passwords(user)) #COMPROBACION
+    #function_check.digest() #no sé si esto hace falta o directamente hex
+    print('RESPONSE PROXY: ' + function_check.hexdigest()) #COMPROBACION
     return function_check.hexdigest()
 
 
@@ -83,6 +87,17 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                        self.dic_users[user][3] + '\r\n')
                 fich.write(line)
 
+    def read_database(self, path):
+        """
+        method to look for the users in the database
+        """
+        with open(path, "r") as fich:
+            for user in self.dic_users:
+                line = (user + ', ' + self.dic_users[user][0] + ', ' + 
+                       str(self.dic_users[user][1]) + ', ' +
+                       self.dic_users[user][2] + ', ' + 
+                       self.dic_users[user][3] + '\r\n')
+                fich.write(line)
     
     def expired(self):
         """
@@ -104,93 +119,120 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
         handle method of the server class
         (all requests will be handled by this method)
         """
-        #self.json2registered()
-        message= self.rfile.read().decode('utf-8')
-        print('lineeeeeeeeee ' + message)#COMPROBACION
-        method = message.split()[0]
-        duration = message.split()[4]
-        print('métodooooooo ' + method)#COMPROBACION
-        if (method == 'REGISTER' or method == 'register'):
-            user = message.split()[1].split(':')[1]
-            ip_address = self.client_address[0]
-            port_address = self.client_address[1]
-            print(user + ' ' + ip_address + ' ' + str(port_address))#COMPROBACION
-            if user in self.dic_users:
-                if duration != '0':
-                    #cambio expire
-                    expire =  time.strftime('%Y-%m-%d %H:%M:%S',
-                                                time.gmtime(time.time() +
-                                                int(duration)))
-                    self.dic_users[user][3] = expire
-                    #subo a base de datos
-                    self.write_database(DB_PATH)
-                    #envío 200ok
-                    self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
-                elif duration == '0':
-                    del self.dic_users[user]
-                    self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
-
-            else:
-                if message.split('\r\n')[2]:
-                    if message.split()[5] == 'Authorization:':
-                        #compruebo si el nonce coincide con mi nonce
-                        client_response = message.split()[7][10:-1]
-                        #if su_nonce==mi_nonce:
-                        my_response = checking(self.nonces[user], user)
-                        if client_response == my_response:
-                            #añado usuario al dic
-                            time_regist = time.strftime('%Y-%m-%d %H:%M:%S',
-                                                        time.gmtime(time.time()))
-                            expire =  time.strftime('%Y-%m-%d %H:%M:%S',
+        while 1:
+            #self.json2registered()
+            message= self.rfile.read().decode('utf-8')
+            if not message:
+                break
+            print('lineeeeeeeeee ' + message)#COMPROBACION
+            method = message.split()[0]
+            duration = message.split()[4]
+            print('métodooooooo ' + method)#COMPROBACION
+            if (method == 'REGISTER' or method == 'register'):
+                user = message.split()[1].split(':')[1]
+                ip_address = self.client_address[0]
+                #port_address = message.split()[1].split(':')[2] #Este es el del uaserver
+                port_address = self.client_address[1]
+                print(user + ' ' + ip_address + ' ' + str(port_address))#COMPROBACION
+                if user in self.dic_users:
+                    print('el usuario está en el dic') #COMPROBACION
+                    if duration != '0':
+                        #cambio expire
+                        expire =  time.strftime('%Y-%m-%d %H:%M:%S',
                                                     time.gmtime(time.time() +
-                                                    int(message[1])))
-                            self.dic_users[user] = [ip_address, port_address,
-                                                    time_regist, expire]
-                            #subo a base de datos
-                            self.write_database(DB_PATH)
-                            #envío 200ok
-                            self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
-                        #else:
-                        else:
-                            #error mal formado
-                            self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
+                                                    int(duration)))
+                        self.dic_users[user][3] = expire
+                        #subo a base de datos
+                        self.write_database(DB_PATH)
+                        #envío 200ok
+                        self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                    elif duration == '0':
+                        del self.dic_users[user]
+                        self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+
+                else:
+                    print('el usuario NO está en el dic') #COMPROBACION
+                    if message.split('\r\n')[2]:
+                        print('el mensaje tiene tercera linea') #COMPROBACION
+                        if message.split()[5] == 'Authorization:':
+                            print('el mensaje tiene Authorization:') #COMPROBACION
+                            #compruebo si el nonce coincide con mi nonce
+                            client_response = message.split()[7][10:-1]
+                            print('CLIENT RESPONSE : ' + client_response) #COMPROBACION
+                            #if su_nonce==mi_nonce:
+                            try:#por si alguien envia nonce sin enviarlo yo
+                                my_response = checking(self.dic_nonces[user], user)
+                                print('MY RESPONSE : ' + my_response) #COMPROBACION
+                                if client_response == my_response:
+                                    print('coinciden nonces') #COMPROBACION
+                                    #añado usuario al dic
+                                    time_regist = time.strftime('%Y-%m-%d %H:%M:%S',
+                                                                time.gmtime(time.time()))
+                                    expire =  time.strftime('%Y-%m-%d %H:%M:%S',
+                                                            time.gmtime(time.time() +
+                                                            int(duration)))
+                                    self.dic_users[user] = [ip_address, port_address,
+                                                            time_regist, expire]
+                                    #subo a base de datos
+                                    self.write_database(DB_PATH)
+                                    #envío 200ok
+                                    self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                                #else:
+                                else:
+                                    print('NO coinciden nonces') #COMPROBACION
+                                    #error mal formado
+                                    self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
+                            except KeyError:
+                                self.wfile.write(b"SIP/2.0 404 User Not Found\r\n\r\n")
                     else:
+                        print('el mensaje NO tiene tercera linea') #COMPROBACION
                         #envío el nonce
                         nonce = random.randint(00000000, 99999999)
-                        self.nonces[user] = nonce
+                        self.dic_nonces[user] = str(nonce)
                         mensaje = ('SIP/2.0 401 Unauthorized\r\n' + 
                                   'WWW Authenticate: Digest nonce="' +
-                                  self.nonces[user] + '\r\n\r\n')
+                                  self.dic_nonces[user] + '"\r\n\r\n')
                         self.wfile.write(bytes(mensaje, 'utf-8'))
+                    
                 
-            
-        elif (method == 'INVITE' or method == 'invite'):
-            pass
-            #miro en mi dic si usuario está
-            #if user in mi dic:
-                #reenvio invite
-                self.wfile.write(b"SIP/2.0 100 Trying\r\n\r\n" +
-                                 b"SIP/2.0 180 Ringing\r\n\r\n" +
-                                 b"SIP/2.0 200 OK\r\n\r\n")
-            #else
-                #user not found
-        elif (method == 'BYE' or method == 'bye'):
-            pass
-            #miro en mi dic si usuario está
-            #if user in mi dic:
-                #lo borro del dic
-            #else
-                #user not found
-        elif (method == 'ACK' or method == 'ack'):
-            pass
-            #no sé si esta es necesaria
-        else:
-            pass
-            #error mal formado
-            
-            
-        print(self.dic_users)
-        self.write_database(DB_PATH)
+            elif (method == 'INVITE' or method == 'invite'):
+                method = message.split()[0]
+                print('métodooooooo ' + method)#COMPROBACION
+                pass
+                #miro en mi dic si usuario está
+                user = message.split()[1].split(':')[1]
+                ip_address = self.client_address[0]
+                port_address = self.client_address[1]
+                print(user + ' ' + ip_address + ' ' + str(port_address))#COMPROBACION
+                if user in self.dic_users:
+                #if user in mi dic:
+                    #reenvio invite
+                    self.wfile.write(b"SIP/2.0 100 Trying\r\n\r\n" +
+                                     b"SIP/2.0 180 Ringing\r\n\r\n" +
+                                     b"SIP/2.0 200 OK\r\n\r\n")
+                #else
+                    #user not found
+            elif (method == 'BYE' or method == 'bye'):
+                method = message.split()[0]
+                print('métodooooooo ' + method)#COMPROBACION
+                pass
+                #miro en mi dic si usuario está
+                #if user in mi dic:
+                    #lo borro del dic
+                #else
+                    #user not found
+            elif (method == 'ACK' or method == 'ack'):
+                method = message.split()[0]
+                print('métodooooooo ' + method)#COMPROBACION
+                pass
+                #no sé si esta es necesaria
+            else:
+                pass
+                #error mal formado
+                
+                
+            print(self.dic_users)
+            self.write_database(DB_PATH)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
