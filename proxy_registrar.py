@@ -4,8 +4,10 @@
 Clase (y programa principal) para un servidor de eco en UDP simple
 """
 
+import hashlib
 import json
 import os
+import random
 import socketserver
 import sys
 import time
@@ -37,12 +39,33 @@ class ProxyHandler(ContentHandler):
         parser.parse(open(fich))
         return(prHandler.get_tags())
 
+def fich_passwords(user):
+    with open(PSSWD_PATH, "r") as fich:
+        for line in fich:
+            user_fich = line.split(' ')[1]
+            if user == user_fich:
+                psswd = line.split(' ')[3]
+                break
+        return psswd
+
+def checking(nonce_user, user):
+    """
+    method to get the number result of hash function
+    with password and nonce
+    """
+    function_check = hashlib.md5()
+    function_check.update(bytes(nonce_user, "utf-8"))
+    function_check.update(bytes(fich_passwords(user), "utf-8"))
+    function_check.digest() #no sé si esto hace falta o directamente hex
+    return function_check.hexdigest()
+
 
 class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
     """
     Echo server class
     """
     dic_users = {}
+    dic_nonces = {}
     """
     Aquí iría la movida del log
     """
@@ -74,6 +97,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
         for user in expired_users:
             del self.dic_users[user]
 
+
     
     def handle(self):
         """
@@ -84,6 +108,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
         message= self.rfile.read().decode('utf-8')
         print('lineeeeeeeeee ' + message)#COMPROBACION
         method = message.split()[0]
+        duration = message.split()[4]
         print('métodooooooo ' + method)#COMPROBACION
         if (method == 'REGISTER' or method == 'register'):
             user = message.split()[1].split(':')[1]
@@ -91,21 +116,52 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
             port_address = self.client_address[1]
             print(user + ' ' + ip_address + ' ' + str(port_address))#COMPROBACION
             if user in self.dic_users:
-                pass
-                #cambio expire
-                #envío 200ok
+                if duration != '0':
+                    #cambio expire
+                    expire =  time.strftime('%Y-%m-%d %H:%M:%S',
+                                                time.gmtime(time.time() +
+                                                int(duration)))
+                    self.dic_users[user][3] = expire
+                    #subo a base de datos
+                    self.write_database(DB_PATH)
+                    #envío 200ok
+                    self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                elif duration == '0':
+                    del self.dic_users[user]
+                    self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+
             else:
                 if message.split('\r\n')[2]:
                     if message.split()[5] == 'Authorization:':
-                        pass
                         #compruebo si el nonce coincide con mi nonce
+                        client_response = message.split()[7][10:-1]
                         #if su_nonce==mi_nonce:
-                            #añado usuario al dic y 200ok
+                        my_response = checking(self.nonces[user], user)
+                        if client_response == my_response:
+                            #añado usuario al dic
+                            time_regist = time.strftime('%Y-%m-%d %H:%M:%S',
+                                                        time.gmtime(time.time()))
+                            expire =  time.strftime('%Y-%m-%d %H:%M:%S',
+                                                    time.gmtime(time.time() +
+                                                    int(message[1])))
+                            self.dic_users[user] = [ip_address, port_address,
+                                                    time_regist, expire]
+                            #subo a base de datos
+                            self.write_database(DB_PATH)
+                            #envío 200ok
+                            self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                         #else:
-                            #error mal formado o no autorizado o algo
+                        else:
+                            #error mal formado
+                            self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
                     else:
-                        pass
                         #envío el nonce
+                        nonce = random.randint(00000000, 99999999)
+                        self.nonces[user] = nonce
+                        mensaje = ('SIP/2.0 401 Unauthorized\r\n' + 
+                                  'WWW Authenticate: Digest nonce="' +
+                                  self.nonces[user] + '\r\n\r\n')
+                        self.wfile.write(bytes(mensaje, 'utf-8'))
                 
             
         elif (method == 'INVITE' or method == 'invite'):
@@ -113,6 +169,9 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
             #miro en mi dic si usuario está
             #if user in mi dic:
                 #reenvio invite
+                self.wfile.write(b"SIP/2.0 100 Trying\r\n\r\n" +
+                                 b"SIP/2.0 180 Ringing\r\n\r\n" +
+                                 b"SIP/2.0 200 OK\r\n\r\n")
             #else
                 #user not found
         elif (method == 'BYE' or method == 'bye'):
@@ -149,6 +208,7 @@ if __name__ == "__main__":
     NAME_SERVER = ProxyHandler.config['server_name']
     PORT_SERVER = int(ProxyHandler.config['server_puerto'])
     DB_PATH = ProxyHandler.config['database_path']
+    PSSWD_PATH = ProxyHandler.config['database_passwdpath']
        
         
     serv = socketserver.UDPServer((IP_SERVER, PORT_SERVER), ProxyRegisterHandler)
