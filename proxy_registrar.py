@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import random
+import socket
 import socketserver
 import sys
 import time
@@ -43,9 +44,10 @@ def fich_passwords(user):
     with open(PSSWD_PATH, "r") as fich:
         psswd = None #ESTO NO SE SI ESTA BIEN O HAY QUE QUITARLO
         for line in fich:
-            user_fich = line.split(' ')[1]
+            user_fich = line.split()[1]
             if user == user_fich:
-                psswd = line.split(' ')[3]
+                psswd = line.split()[3]
+                print('LA CONTRASEÑA EN EL FICH_PASSWD ES : "' + psswd + '"') #COMPROBACION
                 break
         return psswd
 
@@ -56,10 +58,10 @@ def checking(nonce_user, user):
     """
     function_check = hashlib.md5()
     function_check.update(bytes(str(nonce_user), "utf-8"))#NO SE SI HACE FALTA PASAR A STRING
-    print('EL PUTO NONCE ES : ' + nonce_user) #COMPROBACION
+    print('EL PUTO NONCE ES : "' + str(nonce_user) + '"') #COMPROBACION
     function_check.update(bytes(fich_passwords(user), "utf-8"))
-    print('LA CONTRASEÑA ES : ' + fich_passwords(user)) #COMPROBACION
-    #function_check.digest() #no sé si esto hace falta o directamente hex
+    print('LA CONTRASEÑA ES : "' + fich_passwords(user) + '"') #COMPROBACION
+    function_check.digest() #no sé si esto hace falta o directamente hex
     print('RESPONSE PROXY: ' + function_check.hexdigest()) #COMPROBACION
     return function_check.hexdigest()
 
@@ -70,6 +72,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
     """
     dic_users = {}
     dic_nonces = {}
+    dic_peticiones = {}
     """
     Aquí iría la movida del log
     """
@@ -131,8 +134,8 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
             if (method == 'REGISTER' or method == 'register'):
                 user = message.split()[1].split(':')[1]
                 ip_address = self.client_address[0]
-                #port_address = message.split()[1].split(':')[2] #Este es el del uaserver
-                port_address = self.client_address[1]
+                port_address = message.split()[1].split(':')[2] #Este es el del uaserver
+                #port_address = self.client_address[1]
                 print(user + ' ' + ip_address + ' ' + str(port_address))#COMPROBACION
                 if user in self.dic_users:
                     print('el usuario está en el dic') #COMPROBACION
@@ -165,6 +168,8 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                                 print('MY RESPONSE : ' + my_response) #COMPROBACION
                                 if client_response == my_response:
                                     print('coinciden nonces') #COMPROBACION
+                                    #borro del diccionario de nonces el que acabo de ver que está bein
+                                    self.dic_nonces[user]
                                     #añado usuario al dic
                                     time_regist = time.strftime('%Y-%m-%d %H:%M:%S',
                                                                 time.gmtime(time.time()))
@@ -198,20 +203,51 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
             elif (method == 'INVITE' or method == 'invite'):
                 method = message.split()[0]
                 print('métodooooooo ' + method)#COMPROBACION
-                pass
-                #miro en mi dic si usuario está
-                user = message.split()[1].split(':')[1]
-                ip_address = self.client_address[0]
-                port_address = self.client_address[1]
-                print(user + ' ' + ip_address + ' ' + str(port_address))#COMPROBACION
-                if user in self.dic_users:
+                #miro en mi dic si usuario emisor y receptor están
+                user_emisor = message.split()[6].split('=')[1]
+                user_receptor = message.split()[1].split(':')[1]
+                #print(user + ' ' + ip_address + ' ' + str(port_address))#COMPROBACION
+                #print('IP Y PUERTO DEL QUE MANDA EL INVITE' + 
+                 #     self.client_address[0] + str(self.client_address[1]))#COMPROBACION
+                print('User Emisor: ' + user_emisor) #COMPROBACION
+                print('User Receptor: ' + user_receptor) #COMPROBACION
+                print('VOY A COMPROBAR SI LOS USUARIOS EMISOR Y RECEPTOR LOS TENGO EN MI DIC') #COMPROBACION
+                if user_emisor in self.dic_users and user_receptor in self.dic_users:
+                    print('BIEEEEEN LOS TENGO EN MI DIC') #COMPROBACION
                 #if user in mi dic:
-                    #reenvio invite
+                    #cojo datos del usuario receptor (ip y puerto)
+                    #self.dic_users[user] = [ip_address, port_address,time_regist, expire]
+                    ip_address_receptor = self.dic_users[user_receptor][0]
+                    port_address_receptor = self.dic_users[user_receptor][1]
+                    ip_address_emisor = self.dic_users[user_emisor][0]
+                    port_address_emisor = self.dic_users[user_emisor][1]
+                    print('User Emisor: ' + user_emisor) #COMPROBACION
+                    print('ip Emisor: ' + ip_address_emisor) #COMPROBACION
+                    print('port Emisor: ' + str(port_address_emisor)) #COMPROBACION
+                    print('User Receptor: ' + user_receptor) #COMPROBACION
+                    print('ip Emisor: ' + ip_address_receptor) #COMPROBACION
+                    print('port Emisor: ' + str(port_address_receptor)) #COMPROBACION
+                    #reenvio invite (abro socket con el receptor)
+                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+                        my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                        my_socket.connect((ip_address_receptor, int(port_address_receptor)))
+                        my_socket.send(bytes(message, 'utf-8'))
+                        data = my_socket.recv(1024)
+                        print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + data.decode('utf-8'))
+                    self.wfile.write(bytes(data, 'utf-8'))
+                
+                
+                    
+                    """
                     self.wfile.write(b"SIP/2.0 100 Trying\r\n\r\n" +
                                      b"SIP/2.0 180 Ringing\r\n\r\n" +
                                      b"SIP/2.0 200 OK\r\n\r\n")
-                #else
+                    """
+                    #else
+                else:
+                    print('FUUUUUUUCK NO LOS TENGO EN MI DIC') #COMPROBACION
                     #user not found
+                    self.wfile.write(b"SIP/2.0 404 User Not Found\r\n\r\n")
             elif (method == 'BYE' or method == 'bye'):
                 method = message.split()[0]
                 print('métodooooooo ' + method)#COMPROBACION

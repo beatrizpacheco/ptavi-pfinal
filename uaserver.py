@@ -5,6 +5,7 @@ Clase (y programa principal) para un servidor de eco en UDP simple
 """
 
 import os
+import socket
 import socketserver
 import sys
 from uaclient import UAClientHandler
@@ -40,29 +41,35 @@ class EchoHandler(socketserver.DatagramRequestHandler):
         handle method of the server class
         """
         while 1:
-            # Leyendo línea a línea lo que nos envía el servidor
-            line = self.rfile.read()
-            print(line.decode('utf-8'))
-            if not line:
+            # Leyendo línea a línea lo que nos envían
+            message= self.rfile.read().decode('utf-8')
+            print(message)
+            if not message:
                 break
-            list_line_decode = line.decode('utf-8').split(' ')
-            method = list_line_decode[0]
-            if self.error(list_line_decode):
-                self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
-            elif method == 'INVITE':
-                self.wfile.write(b"SIP/2.0 100 Trying\r\n\r\n" +
-                                 b"SIP/2.0 180 Ringing\r\n\r\n" +
-                                 b"SIP/2.0 200 OK\r\nContent-Type: application/sdp\r\n\r\n" + 
-                                 'v=0\r\n' + 
-                                 'o=origen\r\n' +
-                                 's=misesion\r\n' +
-                                 't=0\r\n' +
-                                 'm=audio puerto RTP\r\n')
-            elif method == 'ACK':
-                aEjecutar = './mp32rtp -i 127.0.0.1 -p 23032 < ' + AUDIO_FILE
+            method = message.split(' ')[0]
+            #if self.error(list_line_decode):
+             #   self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
+            if method == 'INVITE' or method == 'invite':
+                ip_emisor = message.split(' ')[7]
+                port_emisor = message.split(' ')[11]
+                self.wfile.write(bytes("SIP/2.0 100 Trying\r\n\r\n" +
+                                       "SIP/2.0 180 Ringing\r\n\r\n" +
+                                       "SIP/2.0 200 OK\r\n\r\n" +
+                                       '\r\n\r\n' + 
+                                       'v=0\r\n' + 
+                                       'o=' + USER + '\r\n' +
+                                       's=misesion' + '\r\n' +
+                                       't=0\r\n' +
+                                       'm=audio ' + RTPAUDIO + ' RTP\r\n', 'utf-8'))
+                
+            elif method == 'ACK' or method == 'ack':
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+                    my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    my_socket.connect((ip_emisor, port_emisor))
+                aEjecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + port_emisor + ' < ' + AUDIO_FILE
                 print('Vamos a ejecutar', aEjecutar)
                 os.system(aEjecutar)
-            elif method == 'BYE':
+            elif method == 'BYE' or method == 'bye':
                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
             elif method not in self.LISTA:
                 self.wfile.write(b"SIP/2.0 405 Method Not Allowed\r\n\r\n")
@@ -79,7 +86,8 @@ if __name__ == "__main__":
     IP_UASERVER = UAClientHandler.config['uaserver_ip']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
     AUDIO_FILE = UAClientHandler.config['audio_path']
-    
+    USER = UAClientHandler.config['account_username']
+    RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
     #Servidor de eco y escuchamos
     SERV = socketserver.UDPServer((IP_UASERVER, PORT_UASERVER), EchoHandler)
     print('listening...')

@@ -48,10 +48,10 @@ def checking(nonce):
     """
     function_check = hashlib.md5()
     function_check.update(bytes(str(nonce), "utf-8"))#NO SE SI EL NONCE HAY QUE PASARLO A STRING O NO
-    print('EL PUTO NONCE ES : ' + str(nonce)) #COMPROBACION
+    print('EL PUTO NONCE ES : "' + str(nonce) + '"') #COMPROBACION
     function_check.update(bytes(str(PASSWORD), "utf-8"))
-    print('LA CONTRASEÑA ES : ' + str(PASSWORD)) #COMPROBACION
-    #function_check.digest() #no sé si esto hace falta o directamente hex
+    print('LA CONTRASEÑA ES : "' + str(PASSWORD) + '"') #COMPROBACION
+    function_check.digest() #no sé si esto hace falta o directamente hex
     print('RESPONSE CLIENT: ' + function_check.hexdigest()) #COMPROBACION
     return function_check.hexdigest()
 
@@ -75,8 +75,10 @@ if __name__ == "__main__":
     PORT_PROXY = int(UAClientHandler.config['regproxy_puerto'])
     USER = UAClientHandler.config['account_username']
     PASSWORD = UAClientHandler.config['account_passwd']
+    IP_UASERVER = UAClientHandler.config['uaserver_puerto']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
     RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
+    AUDIO_FILE = UAClientHandler.config['audio_path']
     
     # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto 
     # del servidor regproxy
@@ -96,7 +98,7 @@ if __name__ == "__main__":
                                  ' SIP/2.0\r\nContent-Type: application/sdp' + 
                                  '\r\n\r\n' + 
                                  'v=0\r\n' + 
-                                 'o=' + USER + '\r\n' +
+                                 'o=' + USER + ' ' + IP_UASERVER + '\r\n' +
                                  's=misesion\r\n' +
                                  't=0\r\n' +
                                  'm=audio ' + RTPAUDIO + ' RTP\r\n',
@@ -120,13 +122,55 @@ if __name__ == "__main__":
                                  OPCION + '\r\n' + 
                                  'Authorization: Digest response="' + 
                                  response + '"\r\n\r\n', 'utf-8'))
-        """
-        for element in MESSAGE_RECEIVE:
-            if METHOD != 'BYE' and element == '200':
-                my_socket.send(bytes('ACK sip:' +
-                                     ' SIP/2.0\r\n', 'utf-8') + b'\r\n')
-                #FALTA PONER BIEN ESTE MENSAJEEE
-        """
+            #Espero recibir el 200ok
+            print('AHORA DEBERIA DE RECIBIR EL 200OK') #COMPROBACION
+            my_socket.connect((IP_PROXY, PORT_PROXY))
+            data = my_socket.recv(1024)
+            print(data.decode('utf-8'))
+        elif 'INVITE' or 'invite' in MESSAGE_RECEIVE:
+            #CREO QUE EN EL UACLIENT NO ME HACE FALTA INVITE
+            #cojo el origen, ip y puerto
+            print('MESSAGE_RECEIVE eeeeeees: ' + data.decode('utf-8'))
+            user_emisor = MESSAGE_RECEIVE[6].split('=')[1]
+            ip_emisor = MESSAGE_RECEIVE[7]
+            port_emisor = MESSAGE_RECEIVE[11]
+            #mando 100, 180, 200 con mi sdp
+            my_socket.send(bytes("SIP/2.0 100 Trying\r\n\r\n" +
+                                 "SIP/2.0 180 Ringing\r\n\r\n" +
+                                 "SIP/2.0 200 OK\r\n\r\n" +
+                                 '\r\n\r\n' + 
+                                 'v=0\r\n' + 
+                                 'o=' + USER + '\r\n' +
+                                 's=misesion' + '\r\n' +
+                                 't=0\r\n' +
+                                 'm=audio ' + RTPAUDIO + ' RTP\r\n', 'utf-8'))
+            my_socket.connect((IP_PROXY, PORT_PROXY))
+            data = my_socket.recv(1024)
+            #si es ack pues abro rtp
+            MESSAGE_RECEIVE = data.decode('utf-8').split()
+            if MESSAGE_RECEIVE[0] == 'ACK' or MESSAGE_RECEIVE[0] == 'ack':
+                print('de PUUUUUUUTA madre, me llega el ack')
+                print(data.decode('utf-8'))
+                #envio rtp
+                my_socket.connect((ip_emisor, port_emisor))
+                aEjecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + port_emisor + ' < ' + AUDIO_FILE
+                print('Vamos a ejecutar', aEjecutar)
+                os.system(aEjecutar)
+                
+        elif '100' or '180' or '200' in MESSAGE_RECEIVE:
+            #cojo ip y puerto
+            ip_receptor = MESSAGE_RECEIVE[11]
+            port_receptor = MESSAGE_RECEIVE[15]
+            #mando ack
+            my_socket.send(bytes('ACK sip:' +
+                                 ' SIP/2.0\r\n', 'utf-8'))
+            #abro socket con el otro y mando rtp
+            my_socket.connect((ip_emisor, port_emisor))
+            aEjecutar = './mp32rtp -i ' + ip_receptor + ' -p ' + port_receptor + ' < ' + AUDIO_FILE
+            print('Vamos a ejecutar', aEjecutar)
+            os.system(aEjecutar)
+            
+            
         print("Terminando socket...")
         #except ConnectionRefusedError:
         #    exit("Error: no server listening at " + IP_PROXY +  " port " + str(PORT_PROXY))
