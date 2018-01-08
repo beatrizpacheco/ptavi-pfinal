@@ -63,7 +63,11 @@ if __name__ == "__main__":
     CONFIG = sys.argv[1]
     if not os.path.exists(CONFIG):
         sys.exit("Config_file doesn't exists")
-    METHOD = sys.argv[2] #  Error si no es un metodo sip
+    METHOD = sys.argv[2]
+    LISTA = ['REGISTER', 'register', 'INVITE', 'invite', 'BYE', 'bye']
+    if METHOD not in LISTA:
+        sys.exit('SIP/2.0 405 Method Not Allowed\r\n' +
+                 'Usage: python3 uaclient.py config method opcion')
     OPCION = sys.argv[3]
     print(UAClientHandler.elparser(CONFIG))
     
@@ -93,7 +97,7 @@ if __name__ == "__main__":
             print(METHOD + ' sip:' + USER + ':' + str(PORT_UASERVER) + 
                   ' SIP/2.0\r\nExpires: ' + OPCION + '\r\n\r\n') #COMPROBACION
         #DESPUES DE ESTO ME ENVIARÁN UN MENSAJE DE AUTENTICACION
-        if (METHOD == 'INVITE' or METHOD == 'invite'):
+        elif (METHOD == 'INVITE' or METHOD == 'invite'):
             my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
                                  ' SIP/2.0\r\nContent-Type: application/sdp' + 
                                  '\r\n\r\n' + 
@@ -105,37 +109,20 @@ if __name__ == "__main__":
                                  'utf-8') + b'\r\n')
         
         
-        if (METHOD == 'BYE' or METHOD == 'bye'):
+        elif (METHOD == 'BYE' or METHOD == 'bye'):
             my_socket.send(bytes(METHOD + ' sip:' + OPCION  +
                                  ' SIP/2.0\r\n', 'utf-8') + b'\r\n')
 
         try:
-            data = my_socket.recv(1024)
-            print('Recibido -- ' + data.decode('utf-8'))
-            MESSAGE_RECEIVE = data.decode('utf-8').split()
-            print('UEEEEEEEEEEEEEEEEEEEEEE: ' + data.decode('utf-8'))
+            DATA = my_socket.recv(1024)
+            print('Recibido -- ' + DATA.decode('utf-8'))
+            MESSAGE_RECEIVE = DATA.decode('utf-8').split()
+            print('UEEEEEEEEEEEEEEEEEEEEEE: ' + DATA.decode('utf-8'))
             
-            if '401' in MESSAGE_RECEIVE:
-                nonce = MESSAGE_RECEIVE[6].split('=')[1][1:-1]
-                print('EL PUTO NONCE de abajo ES : ' + str(nonce)) #COMPROBACION
-                response = checking(nonce)
-                my_socket.send(bytes(METHOD + ' sip:' + USER + ':' +
-                                     str(PORT_UASERVER) + ' SIP/2.0\r\nExpires: ' +
-                                     OPCION + '\r\n' + 
-                                     'Authorization: Digest response="' + 
-                                     response + '"\r\n\r\n', 'utf-8'))
-                #Espero recibir el 200ok
-                print('AHORA DEBERIA DE RECIBIR EL 200OK') #COMPROBACION
-                my_socket.connect((IP_PROXY, PORT_PROXY))
-                data = my_socket.recv(1024)
-                print(data.decode('utf-8'))
-            
-            
-            
-            elif 'INVITE' in MESSAGE_RECEIVE or 'invite' in MESSAGE_RECEIVE:
+            if MESSAGE_RECEIVE[0] == 'INVITE':
                 #CREO QUE EN EL UACLIENT NO ME HACE FALTA INVITE
                 #cojo el origen, ip y puerto
-                print('MESSAGE_RECEIVE eeeeeees: ' + data.decode('utf-8'))
+                print('MESSAGE_RECEIVE eeeeeees: ' + DATA.decode('utf-8'))
                 user_emisor = MESSAGE_RECEIVE[6].split('=')[1]
                 ip_emisor = MESSAGE_RECEIVE[7]
                 port_emisor = MESSAGE_RECEIVE[11]
@@ -150,20 +137,20 @@ if __name__ == "__main__":
                                      't=0\r\n' +
                                      'm=audio ' + RTPAUDIO + ' RTP\r\n', 'utf-8'))
                 my_socket.connect((IP_PROXY, PORT_PROXY))
-                data = my_socket.recv(1024)
+                DATA = my_socket.recv(1024)
                 #si es ack pues abro rtp
-                MESSAGE_RECEIVE = data.decode('utf-8').split()
+                MESSAGE_RECEIVE = DATA.decode('utf-8').split()
                 if MESSAGE_RECEIVE[0] == 'ACK' or MESSAGE_RECEIVE[0] == 'ack':
                     print('de PUUUUUUUTA madre, me llega el ack')
-                    print(data.decode('utf-8'))
+                    print(DATA.decode('utf-8'))
                     #envio rtp
                     my_socket.connect((ip_emisor, port_emisor))
-                    aEjecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + port_emisor + ' < ' + AUDIO_FILE
-                    print('Vamos a ejecutar', aEjecutar)
-                    os.system(aEjecutar)
+                    a_ejecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + port_emisor + ' < ' + AUDIO_FILE
+                    print('Vamos a ejecutar', a_ejecutar)
+                    os.system(a_ejecutar)
                     print('creo que ya se ha acabado')
                     
-            elif '100' in MESSAGE_RECEIVE or '180' in MESSAGE_RECEIVE:
+            elif MESSAGE_RECEIVE[1] == '100':  #100-180-200
                 #cojo ip y puerto
                 user_receptor = MESSAGE_RECEIVE[10].split('=')[1]
                 ip_receptor = MESSAGE_RECEIVE[11]
@@ -173,14 +160,35 @@ if __name__ == "__main__":
                                      ' SIP/2.0\r\n', 'utf-8'))
                 #abro socket con el otro y mando rtp
                 my_socket.connect((ip_receptor, int(port_receptor)))
-                aEjecutar = './mp32rtp -i ' + ip_receptor + ' -p ' + port_receptor + ' < ' + AUDIO_FILE
-                print('Vamos a ejecutar', aEjecutar)
-                os.system(aEjecutar)
+                a_ejecutar = './mp32rtp -i ' + ip_receptor + ' -p ' + port_receptor + ' < ' + AUDIO_FILE
+                print('Vamos a ejecutar', a_ejecutar)
+                os.system(a_ejecutar)
                 print('creo que ya se ha acabado')
 
-            elif '200' in MESSAGE_RECEIVE:
-                pass  
-                
+            elif MESSAGE_RECEIVE[1] == '400':
+                print(DATA.decode('utf-8'))
+            
+            elif MESSAGE_RECEIVE[1] == '401':
+                nonce = MESSAGE_RECEIVE[6].split('=')[1][1:-1]
+                print('EL PUTO NONCE de abajo ES : ' + str(nonce)) #COMPROBACION
+                response = checking(nonce)
+                my_socket.send(bytes(METHOD + ' sip:' + USER + ':' +
+                                     str(PORT_UASERVER) + ' SIP/2.0\r\nExpires: ' +
+                                     OPCION + '\r\n' + 
+                                     'Authorization: Digest response="' + 
+                                     response + '"\r\n\r\n', 'utf-8'))
+                #Espero recibir el 200ok
+                print('AHORA DEBERIA DE RECIBIR EL 200OK') #COMPROBACION
+                my_socket.connect((IP_PROXY, PORT_PROXY))
+                DATA = my_socket.recv(1024)
+                print(DATA.decode('utf-8'))
+            
+            elif MESSAGE_RECEIVE[1] == '404':
+                print(DATA.decode('utf-8'))
+            
+            elif MESSAGE_RECEIVE[1] == '405':
+                print(DATA.decode('utf-8'))
+            
             print("Terminando socket...")
         except ConnectionRefusedError:
             exit("Error: no server listening at " + IP_PROXY +  " port " + str(PORT_PROXY))

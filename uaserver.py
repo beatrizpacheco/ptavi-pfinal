@@ -15,8 +15,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
     Echo server class
     """
     LISTA = ['INVITE', 'ACK', 'BYE']
-    #dic_users = {}
-
+    
     def error(self, line):
         """
         method to verify if message is correct
@@ -73,9 +72,9 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
                     my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                     my_socket.connect((ip_emisor, port_emisor))
-                aEjecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + str(port_emisor) + ' < ' + AUDIO_FILE
-                print('Vamos a ejecutar', aEjecutar)
-                os.system(aEjecutar)
+                a_ejecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + str(port_emisor) + ' < ' + AUDIO_FILE
+                print('Vamos a ejecutar', a_ejecutar)
+                os.system(a_ejecutar)
                 print('creo que ya se ha acabado')
             elif method == 'BYE' or method == 'bye':
                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")

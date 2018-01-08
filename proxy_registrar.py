@@ -149,8 +149,8 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         #envío 200ok
                         self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                     elif duration == '0':
-                        del self.dic_users[user]
                         self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                        del self.dic_users[user]
 
                 else:
                     print('el usuario NO está en el dic') #COMPROBACION
@@ -233,9 +233,9 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                         my_socket.connect((ip_address_receptor, int(port_address_receptor)))
                         my_socket.send(bytes(message, 'utf-8'))
-                        data = my_socket.recv(1024)
-                        print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + data.decode('utf-8'))
-                    self.wfile.write(bytes(data.decode('utf-8'), 'utf-8'))
+                        DATA = my_socket.recv(1024)
+                        print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + DATA.decode('utf-8'))
+                    self.wfile.write(bytes(DATA.decode('utf-8'), 'utf-8'))
                     #else
                 else:
                     print('FUUUUUUUCK NO LOS TENGO EN MI DIC') #COMPROBACION
@@ -264,22 +264,15 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                         my_socket.connect((ip_address_receptor, int(port_address_receptor)))
                         my_socket.send(bytes(message, 'utf-8'))
-                        data = my_socket.recv(1024)
-                        print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + data.decode('utf-8'))
-                    self.wfile.write(bytes(data.decode('utf-8'), 'utf-8'))
+                        DATA = my_socket.recv(1024)
+                        print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + DATA.decode('utf-8'))
+                    self.wfile.write(bytes(DATA.decode('utf-8'), 'utf-8'))
                     #else
                 else:
                     print('FUUUUUUUCK NO LOS TENGO EN MI DIC') #COMPROBACION
                     #user not found
                     self.wfile.write(b"SIP/2.0 404 User Not Found\r\n\r\n")
                 
-                
-                
-                
-                #if user in mi dic:
-                    #lo borro del dic
-                #else
-                    #user not found
             elif (method == 'ACK' or method == 'ack'):
                 method = message.split()[0]
                 print('métodooooooo ' + method)#COMPROBACION
@@ -297,12 +290,10 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                     print('FUUUUUUUCK NO LOS TENGO EN MI DIC') #COMPROBACION
                     #user not found
                     self.wfile.write(b"SIP/2.0 404 User Not Found\r\n\r\n")
-                #Reenvio el ack
                 
             else:
-                pass
-                #error mal formado
-                
+                self.wfile.write(b"SIP/2.0 405 Method Not Allowed\r\n\r\n")
+                #metodo no permitido
                 
             print(self.dic_users)
             self.write_database(DB_PATH)
@@ -326,9 +317,9 @@ if __name__ == "__main__":
     PSSWD_PATH = ProxyHandler.config['database_passwdpath']
        
         
-    serv = socketserver.UDPServer((IP_SERVER, PORT_SERVER), ProxyRegisterHandler)
+    SERV = socketserver.UDPServer((IP_SERVER, PORT_SERVER), ProxyRegisterHandler)
     print("Server " + NAME_SERVER + " listening at port " + str(PORT_SERVER) + "...")
     try:
-        serv.serve_forever()  # Esperando alguna conexion infinitamente
+        SERV.serve_forever()  # Esperando alguna conexion infinitamente
     except KeyboardInterrupt:
         print("Finalizado servidor")
