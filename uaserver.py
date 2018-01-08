@@ -15,6 +15,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
     Echo server class
     """
     LISTA = ['INVITE', 'ACK', 'BYE']
+    #dic_users = {}
 
     def error(self, line):
         """
@@ -46,29 +47,36 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             print(message)
             if not message:
                 break
-            method = message.split(' ')[0]
+            method = message.split()[0]
             #if self.error(list_line_decode):
              #   self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
             if method == 'INVITE' or method == 'invite':
-                ip_emisor = message.split(' ')[7]
-                port_emisor = message.split(' ')[11]
+                ip_emisor = message.split()[7]
+                print('ip: ' + ip_emisor) #COMPROBACION
+                port_emisor = message.split()[11]
+                print('puerto: ' + port_emisor) #COMPROBACION
+                #user_emisor = message.split()[6].split('=')[1]
+                
                 self.wfile.write(bytes("SIP/2.0 100 Trying\r\n\r\n" +
                                        "SIP/2.0 180 Ringing\r\n\r\n" +
                                        "SIP/2.0 200 OK\r\n\r\n" +
                                        '\r\n\r\n' + 
                                        'v=0\r\n' + 
-                                       'o=' + USER + '\r\n' +
+                                       'o=' + USER + ' ' + IP_UASERVER + '\r\n' +
                                        's=misesion' + '\r\n' +
                                        't=0\r\n' +
                                        'm=audio ' + RTPAUDIO + ' RTP\r\n', 'utf-8'))
                 
             elif method == 'ACK' or method == 'ack':
+                ip_emisor = self.client_address[0]
+                port_emisor = self.client_address[1]
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
                     my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                     my_socket.connect((ip_emisor, port_emisor))
-                aEjecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + port_emisor + ' < ' + AUDIO_FILE
+                aEjecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + str(port_emisor) + ' < ' + AUDIO_FILE
                 print('Vamos a ejecutar', aEjecutar)
                 os.system(aEjecutar)
+                print('creo que ya se ha acabado')
             elif method == 'BYE' or method == 'bye':
                 self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
             elif method not in self.LISTA:
