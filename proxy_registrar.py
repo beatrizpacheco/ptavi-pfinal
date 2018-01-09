@@ -114,7 +114,23 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
         for user in expired_users:
             del self.dic_users[user]
 
-
+    def error(self, line):
+        """
+        method to verify if message is correct
+        """
+        fail = False
+        try:
+            if line[1][0:4] != 'sip:':
+                fail = True
+            if '@' not in line[1]:
+                fail = True
+            if ':' not in line[1]:
+                fail = True
+            if 'SIP/2.0\r\n\r\n' not in line[2]:
+                fail = True
+        except IndexError:
+            fail = True
+        return fail
     
     def handle(self):
         """
@@ -129,6 +145,10 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
             print('lineeeeeeeeee ' + message)#COMPROBACION
             method = message.split()[0]
             print('métodooooooo ' + method)#COMPROBACION
+            
+            #if self.error(message):
+             #   self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
+            
             if (method == 'REGISTER' or method == 'register'):
                 user = message.split()[1].split(':')[1]
                 ip_address = self.client_address[0]

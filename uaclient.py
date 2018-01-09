@@ -82,6 +82,7 @@ if __name__ == "__main__":
     IP_UASERVER = UAClientHandler.config['uaserver_ip']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
     RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
+    print('EL PUERTO DONDE ESPERO RECIBIR RTP EEEEEEEEEEEEEEEEES: ' + RTPAUDIO)
     AUDIO_FILE = UAClientHandler.config['audio_path']
     
     # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto 
@@ -144,7 +145,9 @@ if __name__ == "__main__":
                     print('de PUUUUUUUTA madre, me llega el ack')
                     print(DATA.decode('utf-8'))
                     #envio rtp
+                    """
                     my_socket.connect((ip_emisor, port_emisor))
+                    """
                     a_ejecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + port_emisor + ' < ' + AUDIO_FILE
                     print('Vamos a ejecutar', a_ejecutar)
                     os.system(a_ejecutar)
@@ -152,14 +155,16 @@ if __name__ == "__main__":
                     
             elif MESSAGE_RECEIVE[1] == '100':  #100-180-200
                 #cojo ip y puerto
-                user_receptor = MESSAGE_RECEIVE[10].split('=')[1]
-                ip_receptor = MESSAGE_RECEIVE[11]
-                port_receptor = MESSAGE_RECEIVE[15]
+                user_receptor = MESSAGE_RECEIVE[12].split('=')[1]
+                ip_receptor = MESSAGE_RECEIVE[13]
+                port_receptor = MESSAGE_RECEIVE[17]
                 #mando ack
                 my_socket.send(bytes('ACK sip:' + user_receptor +
                                      ' SIP/2.0\r\n', 'utf-8'))
                 #abro socket con el otro y mando rtp
+                """
                 my_socket.connect((ip_receptor, int(port_receptor)))
+                """
                 a_ejecutar = './mp32rtp -i ' + ip_receptor + ' -p ' + port_receptor + ' < ' + AUDIO_FILE
                 print('Vamos a ejecutar', a_ejecutar)
                 os.system(a_ejecutar)
