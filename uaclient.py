@@ -120,6 +120,7 @@ if __name__ == "__main__":
             MESSAGE_RECEIVE = DATA.decode('utf-8').split()
             print('UEEEEEEEEEEEEEEEEEEEEEE: ' + DATA.decode('utf-8'))
             
+            """
             if MESSAGE_RECEIVE[0] == 'INVITE':
                 #CREO QUE EN EL UACLIENT NO ME HACE FALTA INVITE
                 #cojo el origen, ip y puerto
@@ -145,15 +146,15 @@ if __name__ == "__main__":
                     print('de PUUUUUUUTA madre, me llega el ack')
                     print(DATA.decode('utf-8'))
                     #envio rtp
-                    """
-                    my_socket.connect((ip_emisor, port_emisor))
-                    """
+                    """"""
+                    #my_socket.connect((ip_emisor, port_emisor))
+                    """"""
                     a_ejecutar = './mp32rtp -i ' + ip_emisor + ' -p ' + port_emisor + ' < ' + AUDIO_FILE
                     print('Vamos a ejecutar', a_ejecutar)
                     os.system(a_ejecutar)
                     print('creo que ya se ha acabado')
-                    
-            elif MESSAGE_RECEIVE[1] == '100':  #100-180-200
+            """        
+            if MESSAGE_RECEIVE[1] == '100':  #100-180-200
                 #cojo ip y puerto
                 user_receptor = MESSAGE_RECEIVE[12].split('=')[1]
                 ip_receptor = MESSAGE_RECEIVE[13]
