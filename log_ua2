@@ -1,0 +1,11 @@
+20180111005234 Starting...
+20180111005234 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111005234 Recived from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW Authenticate: Digest nonce="20779427"  
+20180111005234 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="4681ebe59309d582eb2e17dc637349ba"  
+20180111005234 Recived from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111005234 Finishing.
+20180111005237 Sent to 127.0.0.5:12345: esto va bien
+20180111005259 Starting...
+20180111005259 Sent to 127.0.0.1:6001: bye sip:user1 SIP/2.0 
+20180111005259 Recived from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111005259 Finishing.
