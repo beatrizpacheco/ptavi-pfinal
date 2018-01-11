@@ -116,7 +116,7 @@ if __name__ == "__main__":
         #write starting
         write_log(LOG_FILE, 'open', None, None, None)
         if (METHOD == 'REGISTER' or METHOD == 'register'):
-            to_send = (METHOD + ' sip:' + USER + ':' + str(PORT_UASERVER) + 
+            to_send = ('REGISTER sip:' + USER + ':' + str(PORT_UASERVER) + 
                        ' SIP/2.0\r\nExpires: ' + OPCION + '\r\n')
             my_socket.send(bytes(to_send, 'utf-8') + b'\r\n')
             print(METHOD + ' sip:' + USER + ':' + str(PORT_UASERVER) + 
@@ -125,7 +125,7 @@ if __name__ == "__main__":
             write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
         
         elif (METHOD == 'INVITE' or METHOD == 'invite'):
-            to_send = (METHOD + ' sip:' + OPCION  +
+            to_send = ('INVITE sip:' + OPCION  +
                        ' SIP/2.0\r\nContent-Type: application/sdp' + 
                        '\r\n\r\n' + 
                        'v=0\r\n' + 
@@ -138,7 +138,7 @@ if __name__ == "__main__":
             write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
 
         elif (METHOD == 'BYE' or METHOD == 'bye'):
-            to_send = (METHOD + ' sip:' + OPCION  + ' SIP/2.0\r\n')
+            to_send = ('BYE sip:' + OPCION  + ' SIP/2.0\r\n')
             my_socket.send(bytes(to_send, 'utf-8') + b'\r\n')
             #write send
             write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
@@ -215,7 +215,7 @@ if __name__ == "__main__":
                 nonce = MESSAGE_RECEIVE[5].split('=')[1][1:-1]
                 print('EL PUTO NONCE de abajo ES : ' + str(nonce)) #COMPROBACION
                 response = checking(nonce)
-                to_send = (METHOD + ' sip:' + USER + ':' +
+                to_send = ('REGISTER sip:' + USER + ':' +
                            str(PORT_UASERVER) + ' SIP/2.0\r\nExpires: ' +
                            OPCION + '\r\n' + 
                            'Authorization: Digest response="' + 

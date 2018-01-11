@@ -12,3 +12,86 @@
 20180111173853 Sent to 127.0.0.1:7001: Vamos a ejecutar./mp32rtp -i 127.0.0.1 -p 7001 < cancion.mp3
 20180111173859 Received from 127.0.0.1:6001: bye sip:user2 SIP/2.0  
 20180111173859 Sent to 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111175907 Finishing.
+20180111180003 Starting...
+20180111180012 Starting...
+20180111180012 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111180012 Received from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="79976745"  
+20180111180012 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="8a0f00687bca19c26d4b82527f9d8a06"  
+20180111180012 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111180012 Finishing.
+20180111180018 Received from 127.0.0.1:6001: invite sip:user2 SIP/2.0 Content-Type: application/sdp  v=0 o=user1 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180111180018 Sent to 127.0.0.1:6001: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180111180018 Received from 127.0.0.1:6001: ACK sip:user2 SIP/2.0 
+20180111180026 Sent to 127.0.0.1:7001: Vamos a ejecutar./mp32rtp -i 127.0.0.1 -p 7001 < cancion.mp3
+20180111180031 Received from 127.0.0.1:6001: bye sip:user2 SIP/2.0  
+20180111180031 Sent to 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111180042 Starting...
+20180111180042 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 0 
+20180111180042 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111180042 Finishing.
+20180111180344 Finishing.
+20180111181218 Starting...
+20180111181218 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111181218 Received from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="66388360"  
+20180111181218 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="a332ea411596bc1d79e4fb66a3538ee9"  
+20180111181218 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111181218 Finishing.
+20180111183655 Starting...
+20180111183655 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111183655 Received from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="10551906"  
+20180111183655 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="337a51b0954c8a29715de2851c918bd1"  
+20180111183655 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111183655 Finishing.
+20180111184102 Starting...
+20180111184102 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111184102 Received from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="91553339"  
+20180111184102 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="bc69011a0c84665d0198d4b2bca530e6"  
+20180111184102 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111184102 Finishing.
+20180111184152 Starting...
+20180111184152 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111184152 Received from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="94122391"  
+20180111184152 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="fdec83b95545af07d446f04a15d1770b"  
+20180111184152 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111184152 Finishing.
+20180111184205 Starting...
+20180111184205 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 0 
+20180111184205 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111184205 Finishing.
+20180111184533 Starting...
+20180111184533 Sent to 127.0.0.1:6001: REGISTER sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111184533 Received from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="17691431"  
+20180111184533 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="76e87d67807df72dd6e9be312693b180"  
+20180111184533 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111184533 Finishing.
+20180111184541 Starting...
+20180111184545 Received from 127.0.0.1:6001: INVITE sip:user2 SIP/2.0 Content-Type: application/sdp  v=0 o=user1 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180111184545 Sent to 127.0.0.1:6001: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180111184545 Received from 127.0.0.1:6001: ACK sip:user2 SIP/2.0 
+20180111184553 Sent to 127.0.0.1:7001: Vamos a ejecutar./mp32rtp -i 127.0.0.1 -p 7001 < cancion.mp3
+20180111184600 Received from 127.0.0.1:6001: BYE sip:user2 SIP/2.0  
+20180111184600 Sent to 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111184615 Starting...
+20180111184615 Sent to 127.0.0.1:6001: REGISTER sip:user2:6039 SIP/2.0 Expires: 0 
+20180111184615 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111184615 Finishing.
+20180111185250 Finishing.
+20180111185304 Starting...
+20180111185304 Sent to 127.0.0.1:6001: REGISTER sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111185304 Received from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="37305683"  
+20180111185304 Sent to 127.0.0.1:6001: REGISTER sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="3dc65f8d4ef9a7e817c29936e38e189e"  
+20180111185304 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111185304 Finishing.
+20180111185317 Starting...
+20180111185322 Received from 127.0.0.1:6001: INVITE sip:user2 SIP/2.0 Content-Type: application/sdp  v=0 o=user1 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180111185322 Sent to 127.0.0.1:6001: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180111185322 Received from 127.0.0.1:6001: ACK sip:user2 SIP/2.0 
+20180111185329 Sent to 127.0.0.1:7001: Vamos a ejecutar./mp32rtp -i 127.0.0.1 -p 7001 < cancion.mp3
+20180111185333 Received from 127.0.0.1:6001: BYE sip:user2 SIP/2.0  
+20180111185333 Sent to 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111185340 Starting...
+20180111185340 Sent to 127.0.0.1:6001: REGISTER sip:user2:6039 SIP/2.0 Expires: 0 
+20180111185340 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111185341 Finishing.
+20180111190657 Finishing.
