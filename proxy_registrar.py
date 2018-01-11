@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
-Clase (y programa principal) para un servidor de eco en UDP simple
+Class (and main program) of the proxy-register server
 """
 
 import hashlib
@@ -12,12 +12,15 @@ import socket
 import socketserver
 import sys
 import time
+from uaclient import write_log
 from xml.sax import make_parser
 from xml.sax.handler import ContentHandler
 
 
 class ProxyHandler(ContentHandler):
-
+    """
+    method to read configuration information of the config file
+    """
     config = {}
 
     def __init__(self):
@@ -41,6 +44,9 @@ class ProxyHandler(ContentHandler):
         return(prHandler.get_tags())
 
 def fich_passwords(user):
+    """
+    method to get the password of clients with password file
+    """
     with open(PSSWD_PATH, "r") as fich:
         psswd = None #ESTO NO SE SI ESTA BIEN O HAY QUE QUITARLO
         for line in fich:
@@ -68,14 +74,11 @@ def checking(nonce_user, user):
 
 class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
     """
-    Echo server class
+    Proxy-Register server class
     """
     dic_users = {}
     dic_nonces = {}
-    """
-    Aquí iría la movida del log
-    """
-
+    
     def write_database(self, path):
         """
         method to save the users in the database
@@ -89,17 +92,11 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                        self.dic_users[user][3] + '\r\n')
                 fich.write(line)
 
-    def read_database(self, path):
+    def read_database(self, path):#Para el extra de leer del fichero
         """
         method to look for the users in the database
         """
-        with open(path, "r") as fich:
-            for user in self.dic_users:
-                line = (user + ', ' + self.dic_users[user][0] + ', ' + 
-                       str(self.dic_users[user][1]) + ', ' +
-                       self.dic_users[user][2] + ', ' + 
-                       self.dic_users[user][3] + '\r\n')
-                fich.write(line)
+        pass
     
     def expired(self):
         """
@@ -114,7 +111,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
         for user in expired_users:
             del self.dic_users[user]
 
-    def error(self, line):
+    def error(self, line):#para el extra del error 400
         """
         method to verify if message is correct
         """
@@ -254,6 +251,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.connect((ip_address_receptor, int(port_address_receptor)))
                         my_socket.send(bytes(message, 'utf-8'))
                         DATA = my_socket.recv(1024)
+                        #
                         print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + DATA.decode('utf-8'))
                     self.wfile.write(bytes(DATA.decode('utf-8'), 'utf-8'))
                     #else
@@ -285,6 +283,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.connect((ip_address_receptor, int(port_address_receptor)))
                         my_socket.send(bytes(message, 'utf-8'))
                         DATA = my_socket.recv(1024)
+                        #
                         print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + DATA.decode('utf-8'))
                     self.wfile.write(bytes(DATA.decode('utf-8'), 'utf-8'))
                     #else
@@ -335,6 +334,7 @@ if __name__ == "__main__":
     PORT_SERVER = int(ProxyHandler.config['server_puerto'])
     DB_PATH = ProxyHandler.config['database_path']
     PSSWD_PATH = ProxyHandler.config['database_passwdpath']
+    LOG_FILE = ProxyHandler.config['log_path']
        
         
     SERV = socketserver.UDPServer((IP_SERVER, PORT_SERVER), ProxyRegisterHandler)

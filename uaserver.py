@@ -1,23 +1,26 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
-Clase (y programa principal) para un servidor de eco en UDP simple
+Class (and main program) of the uaserver
 """
 
 import os
 import socket
 import socketserver
 import sys
-from uaclient import UAClientHandler
+from uaclient import UAClientHandler, write_log
 
-class EchoHandler(socketserver.DatagramRequestHandler):
+class UAServerHandler(socketserver.DatagramRequestHandler):
     """
-    Echo server class
+    UAServer class
     """
     LISTA = ['INVITE', 'ACK', 'BYE']
     dic_rtp = {}
     
     def look_for(self, ip):
+        """
+        method to look for the port of user
+        """
         for user in self.dic_rtp:
             print(user)
             if ip == user:
@@ -39,6 +42,8 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             #if self.error(list_line_decode):
              #   self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
             if method == 'INVITE' or method == 'invite':
+                #write receive
+                #write_log(fich, 'receive', '127.0.0.5', '12345', 'esto va bien')
                 ip_emisor = message.split()[7]
                 print('ip: ' + ip_emisor) #COMPROBACION
                 port_emisor = message.split()[11]
@@ -88,8 +93,10 @@ if __name__ == "__main__":
     AUDIO_FILE = UAClientHandler.config['audio_path']
     USER = UAClientHandler.config['account_username']
     RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
+    LOG_FILE = UAClientHandler.config['log_path']
+    write_log(LOG_FILE, 'send', '127.0.0.5', '12345', 'esto va bien')
     #Servidor de eco y escuchamos
-    SERV = socketserver.UDPServer((IP_UASERVER, PORT_UASERVER), EchoHandler)
+    SERV = socketserver.UDPServer((IP_UASERVER, PORT_UASERVER), UAServerHandler)
     print('listening...')
     try:
         SERV.serve_forever()
