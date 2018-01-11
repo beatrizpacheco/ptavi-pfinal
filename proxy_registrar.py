@@ -142,6 +142,8 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
             print('lineeeeeeeeee ' + message)#COMPROBACION
             method = message.split()[0]
             print('métodooooooo ' + method)#COMPROBACION
+            #write receive
+            write_log(LOG_FILE, 'receive', self.client_address[0], self.client_address[1], message)
             
             #if self.error(message):
              #   self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
@@ -151,7 +153,6 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                 ip_address = self.client_address[0]
                 port_address = message.split()[1].split(':')[2] #Este es el del uaserver
                 duration = message.split()[4]
-                #port_address = self.client_address[1]
                 print(user + ' ' + ip_address + ' ' + str(port_address))#COMPROBACION
                 if user in self.dic_users:
                     print('el usuario está en el dic') #COMPROBACION
@@ -163,11 +164,15 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         self.dic_users[user][3] = expire
                         #subo a base de datos
                         self.write_database(DB_PATH)
-                        #envío 200ok
-                        self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                        
                     elif duration == '0':
-                        self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
                         del self.dic_users[user]
+                    
+                    #envío 200ok
+                    to_send = ('SIP/2.0 200 OK\r\n\r\n')
+                    self.wfile.write(bytes(to_send, 'utf-8'))
+                    #write send
+                    write_log(LOG_FILE, 'send', ip_address, self.client_address[1], to_send)
 
                 else:
                     print('el usuario NO está en el dic') #COMPROBACION
@@ -199,23 +204,34 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                                     #subo a base de datos
                                     self.write_database(DB_PATH)
                                     #envío 200ok
-                                    self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                                    to_send = ('SIP/2.0 200 OK\r\n\r\n')
+                                    self.wfile.write(bytes(to_send, 'utf-8'))
+                                    #write send
+                                    write_log(LOG_FILE, 'send', ip_address, self.client_address[1], to_send)
                                 #else:
                                 else:
                                     print('NO coinciden nonces') #COMPROBACION
                                     #error mal formado
-                                    self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
+                                    to_send = ('SIP/2.0 400 Bad Request\r\n\r\n')
+                                    self.wfile.write(bytes(to_send, 'utf-8'))
+                                    #write send
+                                    write_log(LOG_FILE, 'send', ip_address, self.client_address[1], to_send)
                             except KeyError:
-                                self.wfile.write(b"SIP/2.0 404 User Not Found\r\n\r\n")
+                                to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
+                                self.wfile.write(bytes(to_send, 'utf-8'))
+                                #write send
+                                write_log(LOG_FILE, 'send', ip_address, self.client_address[1], to_send)
                     else:
                         print('el mensaje NO tiene tercera linea') #COMPROBACION
                         #envío el nonce
                         nonce = random.randint(00000000, 99999999)
                         self.dic_nonces[user] = str(nonce)
-                        mensaje = ('SIP/2.0 401 Unauthorized\r\n' + 
-                                  'WWW Authenticate: Digest nonce="' +
+                        to_send = ('SIP/2.0 401 Unauthorized\r\n' + 
+                                  'WWW-Authenticate: Digest nonce="' +
                                   self.dic_nonces[user] + '"\r\n\r\n')
-                        self.wfile.write(bytes(mensaje, 'utf-8'))
+                        self.wfile.write(bytes(to_send, 'utf-8'))
+                        #write send
+                        write_log(LOG_FILE, 'send', ip_address, self.client_address[1], to_send)
                     
                 
             elif (method == 'INVITE' or method == 'invite'):
@@ -250,15 +266,24 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                         my_socket.connect((ip_address_receptor, int(port_address_receptor)))
                         my_socket.send(bytes(message, 'utf-8'))
+                        #write send
+                        write_log(LOG_FILE, 'send', ip_address_receptor, int(port_address_receptor), message)
                         DATA = my_socket.recv(1024)
                         #
                         print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + DATA.decode('utf-8'))
+                        #write receive
+                        write_log(LOG_FILE, 'receive', ip_address_receptor, int(port_address_receptor), DATA.decode('utf-8'))
                     self.wfile.write(bytes(DATA.decode('utf-8'), 'utf-8'))
+                    #write send
+                    write_log(LOG_FILE, 'send', ip_address_emisor, int(port_address_emisor), DATA.decode('utf-8'))
                     #else
                 else:
                     print('FUUUUUUUCK NO LOS TENGO EN MI DIC') #COMPROBACION
                     #user not found
-                    self.wfile.write(b"SIP/2.0 404 User Not Found\r\n\r\n")
+                    to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
+                    self.wfile.write(bytes(to_send, 'utf-8'))
+                    #write send
+                    write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
             
             elif (method == 'BYE' or method == 'bye'):
                 method = message.split()[0]
@@ -282,15 +307,24 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                         my_socket.connect((ip_address_receptor, int(port_address_receptor)))
                         my_socket.send(bytes(message, 'utf-8'))
+                        #write send
+                        write_log(LOG_FILE, 'send', ip_address_receptor, int(port_address_receptor), message)
                         DATA = my_socket.recv(1024)
                         #
+                        #write receive
+                        write_log(LOG_FILE, 'receive', ip_address_receptor, int(port_address_receptor), DATA.decode('utf-8'))
                         print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + DATA.decode('utf-8'))
                     self.wfile.write(bytes(DATA.decode('utf-8'), 'utf-8'))
+                    #write send
+                    write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], DATA.decode('utf-8'))
                     #else
                 else:
                     print('FUUUUUUUCK NO LOS TENGO EN MI DIC') #COMPROBACION
                     #user not found
-                    self.wfile.write(b"SIP/2.0 404 User Not Found\r\n\r\n")
+                    to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
+                    self.wfile.write(bytes(to_send, 'utf-8'))
+                    #write send
+                    write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
                 
             elif (method == 'ACK' or method == 'ack'):
                 method = message.split()[0]
@@ -304,15 +338,23 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                         my_socket.connect((ip_address_emisor, int(port_address_emisor)))
                         my_socket.send(bytes(message, 'utf-8'))
+                        #write send
+                        write_log(LOG_FILE, 'send', ip_address_emisor, int(port_address_emisor), message)
                         
                 else:
                     print('FUUUUUUUCK NO LOS TENGO EN MI DIC') #COMPROBACION
                     #user not found
-                    self.wfile.write(b"SIP/2.0 404 User Not Found\r\n\r\n")
+                    to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
+                    self.wfile.write(bytes(to_send, 'utf-8'))
+                    #write send
+                    write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
                 
             else:
-                self.wfile.write(b"SIP/2.0 405 Method Not Allowed\r\n\r\n")
                 #metodo no permitido
+                to_send = ('SIP/2.0 405 Method Not Allowed\r\n\r\n')
+                self.wfile.write(bytes(to_send, 'utf-8'))
+                #write send
+                write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
                 
             print(self.dic_users)
             self.write_database(DB_PATH)
@@ -336,10 +378,13 @@ if __name__ == "__main__":
     PSSWD_PATH = ProxyHandler.config['database_passwdpath']
     LOG_FILE = ProxyHandler.config['log_path']
        
-        
+    #write starting
+    write_log(LOG_FILE, 'open', None, None, None)
     SERV = socketserver.UDPServer((IP_SERVER, PORT_SERVER), ProxyRegisterHandler)
     print("Server " + NAME_SERVER + " listening at port " + str(PORT_SERVER) + "...")
     try:
         SERV.serve_forever()  # Esperando alguna conexion infinitamente
     except KeyboardInterrupt:
         print("Finalizado servidor")
+        #write fin
+        write_log(LOG_FILE, 'fin', None, None, None)

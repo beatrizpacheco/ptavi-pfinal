@@ -1,11 +1,14 @@
-20180111005234 Starting...
-20180111005234 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 
-20180111005234 Recived from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW Authenticate: Digest nonce="20779427"  
-20180111005234 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="4681ebe59309d582eb2e17dc637349ba"  
-20180111005234 Recived from 127.0.0.1:6001: SIP/2.0 200 OK  
-20180111005234 Finishing.
-20180111005237 Sent to 127.0.0.5:12345: esto va bien
-20180111005259 Starting...
-20180111005259 Sent to 127.0.0.1:6001: bye sip:user1 SIP/2.0 
-20180111005259 Recived from 127.0.0.1:6001: SIP/2.0 200 OK  
-20180111005259 Finishing.
+20180111173834 Starting...
+20180111173834 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 
+20180111173834 Received from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="87927874"  
+20180111173834 Sent to 127.0.0.1:6001: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="f6c6dcab48b2961b3ad9a940fe5d7b4b"  
+20180111173834 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111173834 Finishing.
+20180111173840 Finishing.
+20180111173842 Starting...
+20180111173845 Received from 127.0.0.1:6001: invite sip:user2 SIP/2.0 Content-Type: application/sdp  v=0 o=user1 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180111173845 Sent to 127.0.0.1:6001: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180111173845 Received from 127.0.0.1:6001: ACK sip:user2 SIP/2.0 
+20180111173853 Sent to 127.0.0.1:7001: Vamos a ejecutar./mp32rtp -i 127.0.0.1 -p 7001 < cancion.mp3
+20180111173859 Received from 127.0.0.1:6001: bye sip:user2 SIP/2.0  
+20180111173859 Sent to 127.0.0.1:6001: SIP/2.0 200 OK  

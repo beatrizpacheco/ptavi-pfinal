@@ -39,27 +39,30 @@ class UAServerHandler(socketserver.DatagramRequestHandler):
             if not message:
                 break
             method = message.split()[0]
+            #write receive
+            write_log(LOG_FILE, 'receive', IP_PROXY, PORT_PROXY, message)
             #if self.error(list_line_decode):
              #   self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
             if method == 'INVITE' or method == 'invite':
-                #write receive
-                #write_log(fich, 'receive', '127.0.0.5', '12345', 'esto va bien')
                 ip_emisor = message.split()[7]
                 print('ip: ' + ip_emisor) #COMPROBACION
                 port_emisor = message.split()[11]
                 print('puerto: ' + port_emisor) #COMPROBACION
                 #user_emisor = message.split()[6].split('=')[1]
                 self.dic_rtp[ip_emisor] = port_emisor
-                self.wfile.write(bytes("SIP/2.0 100 Trying\r\n\r\n" +
-                                       "SIP/2.0 180 Ringing\r\n\r\n" +
-                                       "SIP/2.0 200 OK\r\n" +
-                                       "Content-Type: application/sdp" +
-                                       '\r\n\r\n' + 
-                                       'v=0\r\n' + 
-                                       'o=' + USER + ' ' + IP_UASERVER + '\r\n' +
-                                       's=misesion' + '\r\n' +
-                                       't=0\r\n' +
-                                       'm=audio ' + RTPAUDIO + ' RTP\r\n', 'utf-8'))
+                to_send = ("SIP/2.0 100 Trying\r\n\r\n" +
+                           "SIP/2.0 180 Ringing\r\n\r\n" +
+                           "SIP/2.0 200 OK\r\n" +
+                           "Content-Type: application/sdp" +
+                           '\r\n\r\n' + 
+                           'v=0\r\n' + 
+                           'o=' + USER + ' ' + IP_UASERVER + '\r\n' +
+                           's=misesion' + '\r\n' +
+                           't=0\r\n' +
+                           'm=audio ' + RTPAUDIO + ' RTP\r\n')
+                self.wfile.write(bytes(to_send, 'utf-8'))
+                #write send
+                write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
                 
             elif method == 'ACK' or method == 'ack':
                 ip_emisor = self.client_address[0]
@@ -74,10 +77,18 @@ class UAServerHandler(socketserver.DatagramRequestHandler):
                 print('Vamos a ejecutar', a_ejecutar)
                 os.system(a_ejecutar)
                 print('creo que ya se ha acabado')
+                #write send
+                write_log(LOG_FILE, 'send', ip_emisor, port_emisor, ('Vamos a ejecutar' + a_ejecutar))
             elif method == 'BYE' or method == 'bye':
-                self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+                to_send = ('SIP/2.0 200 OK\r\n\r\n')
+                #write send
+                write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
+                self.wfile.write(bytes(to_send, 'utf-8'))
             elif method not in self.LISTA:
-                self.wfile.write(b"SIP/2.0 405 Method Not Allowed\r\n\r\n")
+                to_send = ('SIP/2.0 405 Method Not Allowed\r\n\r\n')
+                self.wfile.write(bytes(to_send, 'utf-8'))
+                #write send
+                write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -87,20 +98,28 @@ if __name__ == "__main__":
     if not os.path.exists(CONFIG):
         sys.exit("Config_file doesn't exists")
     print(UAClientHandler.elparser(CONFIG))
-    
+    if UAClientHandler.config["regproxy_ip"] == None:
+        IP_PROXY = "127.0.0.1"
+    else:
+        IP_PROXY = UAClientHandler.config['regproxy_ip']
+    PORT_PROXY = int(UAClientHandler.config['regproxy_puerto'])
     IP_UASERVER = UAClientHandler.config['uaserver_ip']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
     AUDIO_FILE = UAClientHandler.config['audio_path']
     USER = UAClientHandler.config['account_username']
     RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
     LOG_FILE = UAClientHandler.config['log_path']
-    write_log(LOG_FILE, 'send', '127.0.0.5', '12345', 'esto va bien')
+    
+    #write starting
+    write_log(LOG_FILE, 'open', None, None, None)
     #Servidor de eco y escuchamos
     SERV = socketserver.UDPServer((IP_UASERVER, PORT_UASERVER), UAServerHandler)
     print('listening...')
     try:
         SERV.serve_forever()
     except KeyboardInterrupt:
+        #write fin
+        write_log(LOG_FILE, 'fin', None, None, None)
         print('servidor finalizado')
 
 

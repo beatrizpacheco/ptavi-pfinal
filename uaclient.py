@@ -212,7 +212,7 @@ if __name__ == "__main__":
                 
             
             elif MESSAGE_RECEIVE and MESSAGE_RECEIVE[1] == '401':
-                nonce = MESSAGE_RECEIVE[6].split('=')[1][1:-1]
+                nonce = MESSAGE_RECEIVE[5].split('=')[1][1:-1]
                 print('EL PUTO NONCE de abajo ES : ' + str(nonce)) #COMPROBACION
                 response = checking(nonce)
                 to_send = (METHOD + ' sip:' + USER + ':' +

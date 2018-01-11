@@ -1,13 +1,7 @@
-20180111005218 Starting...
-20180111005218 Sent to 127.0.0.1:6001: REGISTER sip:user1:6038 SIP/2.0 Expires: 3600 
-20180111005218 Recived from 127.0.0.1:6001: SIP/2.0 401 Unauthorized WWW Authenticate: Digest nonce="74932813"  
-20180111005218 Sent to 127.0.0.1:6001: REGISTER sip:user1:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="d6cbfc04e0a3121ac54962bd8cf735b6"  
-20180111005218 Recived from 127.0.0.1:6001: SIP/2.0 200 OK  
-20180111005218 Finishing.
-20180111005226 Sent to 127.0.0.5:12345: esto va bien
-20180111005246 Starting...
-20180111005246 Sent to 127.0.0.1:6001: invite sip:user2 SIP/2.0 Content-Type: application/sdp  v=0 o=user1 127.0.0.1 s=misesion t=0 m=audio 7001 RTP 
-20180111005246 Recived from 127.0.0.1:6001: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
-20180111005246 Sent to 127.0.0.1:6001: ACK sip:user2 SIP/2.0 
-20180111005254 Sent to 127.0.0.1:7002: Vamos a ejecutar./mp32rtp -i 127.0.0.1 -p 7002 < cancion.mp3
-20180111005254 Finishing.
+20180111174826 Starting...
+20180111174836 Finishing.
+20180111174841 Starting...
+20180111174841 Sent to 127.0.0.1:6001: register sip:user1:6038 SIP/2.0 Expires: 3600 
+20180111174841 Received from 127.0.0.1:6001: SIP/2.0 200 OK  
+20180111174841 Finishing.
+20180111174850 Starting...

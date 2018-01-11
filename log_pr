@@ -1,0 +1,30 @@
+20180111173824 Finishing.
+20180111173827 Starting...
+20180111173831 Received from 127.0.0.1:59292: register sip:user1:6038 SIP/2.0 Expires: 3600  
+20180111173831 Sent to 127.0.0.1:59292: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="35127309"  
+20180111173831 Received from 127.0.0.1:59292: register sip:user1:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="d72a86a671ed70fcbcc4be2a3447a9d9"  
+20180111173831 Sent to 127.0.0.1:59292: SIP/2.0 200 OK  
+20180111173834 Received from 127.0.0.1:57755: register sip:user2:6039 SIP/2.0 Expires: 3600  
+20180111173834 Sent to 127.0.0.1:57755: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="87927874"  
+20180111173834 Received from 127.0.0.1:57755: register sip:user2:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="f6c6dcab48b2961b3ad9a940fe5d7b4b"  
+20180111173834 Sent to 127.0.0.1:57755: SIP/2.0 200 OK  
+20180111173845 Received from 127.0.0.1:50832: invite sip:user2 SIP/2.0 Content-Type: application/sdp  v=0 o=user1 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180111173845 Sent to 127.0.0.1:6039: invite sip:user2 SIP/2.0 Content-Type: application/sdp  v=0 o=user1 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180111173845 Received from 127.0.0.1:6039: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180111173845 Sent to 127.0.0.1:6038: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180111173845 Received from 127.0.0.1:50832: ACK sip:user2 SIP/2.0 
+20180111173845 Sent to 127.0.0.1:6039: ACK sip:user2 SIP/2.0 
+20180111173859 Received from 127.0.0.1:38445: bye sip:user2 SIP/2.0  
+20180111173859 Sent to 127.0.0.1:6039: bye sip:user2 SIP/2.0  
+20180111173859 Received from 127.0.0.1:6039: SIP/2.0 200 OK  
+20180111173859 Sent to 127.0.0.1:38445: SIP/2.0 200 OK  
+20180111174435 Finishing.
+20180111174436 Starting...
+20180111174440 Received from 127.0.0.1:55839: register sip:user1:6038 SIP/2.0 Expires: 3600  
+20180111174440 Sent to 127.0.0.1:55839: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="65088356"  
+20180111174440 Received from 127.0.0.1:55839: register sip:user1:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="130dd76a1d2f95868e8715ade4814d44"  
+20180111174440 Sent to 127.0.0.1:55839: SIP/2.0 200 OK  
+20180111174456 Received from 127.0.0.1:50947: register sip:user1:6038 SIP/2.0 Expires: 3600  
+20180111174456 Sent to 127.0.0.1:50947: SIP/2.0 200 OK  
+20180111174841 Received from 127.0.0.1:39115: register sip:user1:6038 SIP/2.0 Expires: 3600  
+20180111174841 Sent to 127.0.0.1:39115: SIP/2.0 200 OK  
