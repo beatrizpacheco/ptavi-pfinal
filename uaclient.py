@@ -50,11 +50,8 @@ def checking(nonce):
     """
     function_check = hashlib.md5()
     function_check.update(bytes(str(nonce), "utf-8"))
-    print('EL PUTO NONCE ES : "' + str(nonce) + '"')  # COMPROBACION
     function_check.update(bytes(str(PASSWORD), "utf-8"))
-    print('LA CONTRASEÑA ES : "' + str(PASSWORD) + '"')  # COMPROBACION
-    function_check.digest()  # no sé si esto hace falta o directamente hex
-    print('RESPONSE CLIENT: ' + function_check.hexdigest())  # COMPROBACION
+    function_check.digest()
     return function_check.hexdigest()
 
 
@@ -122,8 +119,6 @@ if __name__ == "__main__":
             to_send = (METHOD + ' sip:' + USER + ':' + str(PORT_UASERVER) +
                        ' SIP/2.0\r\nExpires: ' + OPCION + '\r\n')
             my_socket.send(bytes(to_send, 'utf-8') + b'\r\n')
-            print(METHOD + ' sip:' + USER + ':' + str(PORT_UASERVER) +
-                  ' SIP/2.0\r\nExpires: ' + OPCION + '\r\n')  # COMPROBACION
             # write send
             write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
 
@@ -182,8 +177,6 @@ if __name__ == "__main__":
 
             elif MESSAGE_RECEIVE and MESSAGE_RECEIVE[1] == '401':
                 nonce = MESSAGE_RECEIVE[5].split('=')[1][1:-1]
-                # COMPROBACION
-                print('EL PUTO NONCE de abajo ES : ' + str(nonce))
                 response = checking(nonce)
                 to_send = ('REGISTER sip:' + USER + ':' +
                            str(PORT_UASERVER) + ' SIP/2.0\r\nExpires: ' +
@@ -194,7 +187,6 @@ if __name__ == "__main__":
                 # write send
                 write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
                 # Espero recibir el 200ok
-                print('AHORA DEBERIA DE RECIBIR EL 200OK')  # COMPROBACION
                 my_socket.connect((IP_PROXY, PORT_PROXY))
                 DATA = my_socket.recv(1024)
                 print(DATA.decode('utf-8'))
@@ -202,10 +194,13 @@ if __name__ == "__main__":
                 write_log(LOG_FILE, 'receive', IP_PROXY, PORT_PROXY,
                           DATA.decode('utf-8'))
 
-            elif MESSAGE_RECEIVE and ((MESSAGE_RECEIVE[1] == '400') or 
-                                      (MESSAGE_RECEIVE[1] == '404') or 
+            elif MESSAGE_RECEIVE and ((MESSAGE_RECEIVE[1] == '400') or
+                                      (MESSAGE_RECEIVE[1] == '404') or
                                       (MESSAGE_RECEIVE[1] == '405')):
                 print(DATA.decode('utf-8'))
+                # write error
+                write_log(LOG_FILE, 'error', None, None,
+                          DATA.decode('utf-8'))
 
             print("Terminando socket...")
 

@@ -44,16 +44,11 @@ class UAServerHandler(socketserver.DatagramRequestHandler):
             method = message.split()[0]
             # write receive
             write_log(LOG_FILE, 'receive', IP_PROXY, PORT_PROXY, message)
-            # if self.error(list_line_decode):
-            #   self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
-            if error(message.split()):  # or correct ip or correct port
+            if error(message.split()):  
                 self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
             elif method == 'INVITE' or method == 'invite':
                 ip_emisor = message.split()[7]
-                print('ip: ' + ip_emisor)  # COMPROBACION
                 port_emisor = message.split()[11]
-                print('puerto: ' + port_emisor)  # COMPROBACION
-                # user_emisor = message.split()[6].split('=')[1]
                 self.dic_rtp[ip_emisor] = port_emisor
                 to_send = ("SIP/2.0 100 Trying\r\n\r\n" +
                            "SIP/2.0 180 Ringing\r\n\r\n" +

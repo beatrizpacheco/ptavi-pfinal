@@ -54,7 +54,6 @@ def fich_passwords(user):
             user_fich = line.split()[1]
             if user == user_fich:
                 psswd = line.split()[3]
-                print('LA CONTRASEÑA EN EL FICH_PASSWD ES : "' + psswd + '"')  # COMPROBACION
                 break
         return psswd
 
@@ -66,42 +65,10 @@ def checking(nonce_user, user):
     """
     function_check = hashlib.md5()
     function_check.update(bytes(str(nonce_user), "utf-8"))
-    print('EL PUTO NONCE ES : "' + str(nonce_user) + '"')  # COMPROBACION
     function_check.update(bytes(fich_passwords(user), "utf-8"))
-    print('LA CONTRASEÑA ES : "' + fich_passwords(user) + '"')  # COMPROBACION
-    function_check.digest()  # no sé si esto hace falta o directamente hex
-    print('RESPONSE PROXY: ' + function_check.hexdigest())  # COMPROBACION
+    function_check.digest()
     return function_check.hexdigest()
 
-
-def correct_ip(ip):
-    """
-    method to verify if ip is correct
-    """
-    fail = False
-    try:
-        num_ip = ip.split('.')
-        for nums in num_ip:
-            if num >= 255 or num <= 0:
-                fail = True
-        if ip.find('.') != 3:
-            fail = True
-    except:
-        fail = True
-    return fail
-
-def correct_port(port):
-    """
-    method to verify if port is correct
-    """
-    fail = False
-    try:
-        int(port)
-        if port <= 0 or port >= 65535:
-            fail = True
-    except:
-        fail = True
-    return fail
 
 def error(line):  # para el extra del error 400
     """
@@ -150,12 +117,6 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         str(self.dic_users[user][3]) + '\r\n')
                 fich.write(line)
 
-    def read_database(self, path):  # Para el extra de leer del fichero
-        """
-        method to look for the users in the database
-        """
-        pass
-
     def expired(self):
         """
         method to check expiration of users
@@ -174,18 +135,15 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
         (all requests will be handled by this method)
         """
         while 1:
-            # self.json2registered()
             message = self.rfile.read().decode('utf-8')
             if not message:
                 break
-            print('lineeeeeeeeee ' + message)  # COMPROBACION
             method = message.split()[0]
-            print('métodooooooo ' + method)  # COMPROBACION
             # write receive
             write_log(LOG_FILE, 'receive', self.client_address[0],
                       self.client_address[1], message)
-            print('este es el mensajeeeeeeeeee' + message)
-            if error(message.split()):  # or correct ip or correct port
+            print(message)
+            if error(message.split()):
                 self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
 
             elif (method == 'REGISTER' or method == 'register'):
@@ -193,9 +151,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                 ip_address = self.client_address[0]
                 port_address = message.split()[1].split(':')[2]  # uaserver
                 duration = message.split()[4]
-                print(user + ' ' + ip_address + ' ' + str(port_address))  # COMPROBACION
                 if user in self.dic_users:
-                    print('el usuario está en el dic')  # COMPROBACION
                     if duration != '0':
                         # cambio expire
                         expire = time.time() + int(duration)
@@ -214,27 +170,18 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                               self.client_address[1], to_send)
 
                 else:
-                    print('el usuario NO está en el dic')  # COMPROBACION
                     if message.split('\r\n')[2]:
-                        print('el mensaje tiene tercera linea')  # COMPROBACION
                         if message.split()[5] == 'Authorization:':
-                            print('el mensaje tiene Authorization:')  # COMPROBACION
                             # compruebo si el nonce coincide con mi nonce
                             client_response = message.split()[7][10:-1]
-                            print('CLIENT RESPONSE : ' + client_response)  # COMPROBACION
-                            # if su_nonce==mi_nonce:
                             try:  # por si alguien envia nonce sin enviarlo yo
-                                my_response = checking(self.dic_nonces[user], user)
-                                print('MY RESPONSE : ' + my_response)  # COMPROBACION
+                                my_response = checking(self.dic_nonces[user],
+                                                       user)
                                 if client_response == my_response:
-                                    print('coinciden nonces')  # COMPROBACION
-                                    # borro del diccionario de nonces el que acabo de ver que está bein
                                     self.dic_nonces[user]
                                     # añado usuario al dic
                                     time_regist = time.time()
                                     expire = time.time() + int(duration)
-                                    # time.strftime('%Y-%m-%d %H:%M:%S',time.gmtime(time.time()+3600))
-                                    # Esto para cuando me de una hora menos que la real
                                     self.dic_users[user] = [ip_address,
                                                             port_address,
                                                             time_regist,
@@ -247,23 +194,22 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                                     # write send
                                     write_log(LOG_FILE, 'send', ip_address,
                                               self.client_address[1], to_send)
-                                # else:
                                 else:
-                                    print('NO coinciden nonces')  # COMPROBACION
                                     # error mal formado
-                                    to_send = ('SIP/2.0 400 Bad Request\r\n\r\n')
+                                    to_send = ('SIP/2.0 400 Bad Request' +
+                                               '\r\n\r\n')
                                     self.wfile.write(bytes(to_send, 'utf-8'))
                                     # write send
                                     write_log(LOG_FILE, 'send', ip_address,
                                               self.client_address[1], to_send)
                             except KeyError:
-                                to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
+                                to_send = ('SIP/2.0 404 User Not Found' +
+                                           '\r\n\r\n')
                                 self.wfile.write(bytes(to_send, 'utf-8'))
                                 # write send
                                 write_log(LOG_FILE, 'send', ip_address,
                                           self.client_address[1], to_send)
                     else:
-                        print('el mensaje NO tiene tercera linea')  # COMPROBACION
                         # envío el nonce
                         nonce = random.randint(00000000, 99999999)
                         self.dic_nonces[user] = str(nonce)
@@ -276,148 +222,149 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                                   self.client_address[1], to_send)
 
             elif (method == 'INVITE' or method == 'invite'):
-                print('métodooooooo ' + method)  # COMPROBACION
                 # miro en mi dic si usuario emisor y receptor están
                 user_emisor = message.split()[6].split('=')[1]
                 user_receptor = message.split()[1].split(':')[1]
-                print('User Emisor: ' + user_emisor)  # COMPROBACION
-                print('User Receptor: ' + user_receptor)  # COMPROBACION
-                print('VOY A COMPROBAR SI LOS USUARIOS EMISOR Y RECEPTOR LOS TENGO EN MI DIC')  # COMPROBACION
-                if user_emisor in self.dic_users and user_receptor in self.dic_users:
-                    print('BIEEEEEN LOS TENGO EN MI DIC')  # COMPROBACION
-                # if user in mi dic:
-                    # cojo datos del usuario receptor (ip y puerto)
-                    # self.dic_users[user] = [ip_address, port_address,time_regist, expire]
-                    ip_address_receptor = self.dic_users[user_receptor][0]
-                    port_address_receptor = self.dic_users[user_receptor][1]
-                    ip_address_emisor = self.dic_users[user_emisor][0]
-                    port_address_emisor = self.dic_users[user_emisor][1]
-                    print('User Emisor: ' + user_emisor)  # COMPROBACION
-                    print('ip Emisor: ' + ip_address_emisor)  # COMPROBACION
-                    print('port Emisor: ' + str(port_address_emisor))  # COMPROBACION
-                    print('User Receptor: ' + user_receptor)  # COMPROBACION
-                    print('ip Emisor: ' + ip_address_receptor)  # COMPROBACION
-                    print('port Emisor: ' + str(port_address_receptor))  # COMPROBACION
-                    # reenvio invite (abro socket con el receptor)
-                    try:
-                        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
-                            my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                            my_socket.connect((ip_address_receptor, int(port_address_receptor)))
-                            my_socket.send(bytes(message, 'utf-8'))
+                if user_emisor in self.dic_users:
+                    if user_receptor in self.dic_users:
+                        ip_address_receptor = self.dic_users[user_receptor][0]
+                        p_address_receptor = self.dic_users[user_receptor][1]
+                        ip_address_emisor = self.dic_users[user_emisor][0]
+                        port_address_emisor = self.dic_users[user_emisor][1]
+                        try:
+                            with socket.socket(socket.AF_INET,
+                                               socket.SOCK_DGRAM) as my_socket:
+                                my_socket.setsockopt(socket.SOL_SOCKET,
+                                                     socket.SO_REUSEADDR, 1)
+                                my_socket.connect((ip_address_receptor,
+                                                  int(p_address_receptor)))
+                                my_socket.send(bytes(message, 'utf-8'))
+                                # write send
+                                write_log(LOG_FILE, 'send',
+                                          ip_address_receptor,
+                                          int(p_address_receptor), message)
+                                DATA = my_socket.recv(1024)
+                                # write receive
+                                write_log(LOG_FILE, 'receive',
+                                          ip_address_receptor,
+                                          int(p_address_receptor),
+                                          DATA.decode('utf-8'))
+                            self.wfile.write(bytes(DATA.decode('utf-8'),
+                                                   'utf-8'))
                             # write send
-                            write_log(LOG_FILE, 'send', ip_address_receptor, int(port_address_receptor), message)
-                            DATA = my_socket.recv(1024)
-                            print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + DATA.decode('utf-8'))
-                            # write receive
-                            write_log(LOG_FILE, 'receive', ip_address_receptor, int(port_address_receptor), DATA.decode('utf-8'))
-
-                        self.wfile.write(bytes(DATA.decode('utf-8'), 'utf-8'))
-                        # write send
-                        write_log(LOG_FILE, 'send', ip_address_emisor, int(port_address_emisor), DATA.decode('utf-8'))
-                    except ConnectionRefusedError:
-                        to_send = ("Error: no server listening at " + ip_address_receptor + " port " + port_address_receptor)
-                        print(to_send)
-                        write_log(LOG_FILE, 'error', None, None, to_send)
-                        to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
-                        self.wfile.write(bytes(to_send, 'utf-8'))
-                        # write send
-                        write_log(LOG_FILE, 'send', ip_address_emisor, int(port_address_emisor), to_send)
-                    # else
+                            write_log(LOG_FILE, 'send', ip_address_emisor,
+                                      int(port_address_emisor),
+                                      DATA.decode('utf-8'))
+                        except ConnectionRefusedError:
+                            to_send = ("Error: no server listening at " +
+                                       ip_address_receptor + " port " +
+                                       p_address_receptor)
+                            print(to_send)
+                            write_log(LOG_FILE, 'error', None, None, to_send)
+                            to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
+                            self.wfile.write(bytes(to_send, 'utf-8'))
+                            # write send
+                            write_log(LOG_FILE, 'send', ip_address_emisor,
+                                      int(port_address_emisor), to_send)
                 else:
-                    print('FUUUUUUUCK NO LOS TENGO EN MI DIC')  # COMPROBACION
                     # user not found
                     to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
                     self.wfile.write(bytes(to_send, 'utf-8'))
                     # write send
-                    write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
+                    write_log(LOG_FILE, 'send', self.client_address[0],
+                              self.client_address[1], to_send)
 
             elif (method == 'BYE' or method == 'bye'):
                 method = message.split()[0]
-                print('métodooooooo ' + method)  # COMPROBACION
                 # miro en mi dic si usuario está
                 user_receptor = message.split()[1].split(':')[1]
-                print('User Receptor: ' + user_receptor)  # COMPROBACION
-                print('VOY A COMPROBAR SI LOS USUARIOS LOS TENGO EN MI DIC')  # COMPROBACION
                 if user_receptor in self.dic_users:
-                    print('BIEEEEEN LOS TENGO EN MI DIC')  # COMPROBACION
-                # if user in mi dic:
-                    # cojo datos del usuario receptor (ip y puerto)
-                    # self.dic_users[user] = [ip_address, port_address,time_regist, expire]
                     ip_address_receptor = self.dic_users[user_receptor][0]
                     port_address_receptor = self.dic_users[user_receptor][1]
-                    print('User Receptor: ' + user_receptor)  # COMPROBACION
-                    print('ip Emisor: ' + ip_address_receptor)  # COMPROBACION
-                    print('port Emisor: ' + str(port_address_receptor))  # COMPROBACION
-                    # reenvio bye (abro socket con el receptor)
                     try:
-                        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
-                            my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                            my_socket.connect((ip_address_receptor, int(port_address_receptor)))
+                        with socket.socket(socket.AF_INET,
+                                           socket.SOCK_DGRAM) as my_socket:
+                            my_socket.setsockopt(socket.SOL_SOCKET,
+                                                 socket.SO_REUSEADDR, 1)
+                            my_socket.connect((ip_address_receptor,
+                                              int(port_address_receptor)))
                             my_socket.send(bytes(message, 'utf-8'))
                             # write send
-                            write_log(LOG_FILE, 'send', ip_address_receptor, int(port_address_receptor), message)
+                            write_log(LOG_FILE, 'send', ip_address_receptor,
+                                      int(port_address_receptor), message)
                             DATA = my_socket.recv(1024)
                             # write receive
-                            write_log(LOG_FILE, 'receive', ip_address_receptor, int(port_address_receptor), DATA.decode('utf-8'))
-                            print('LA RESPUESTA DEL RECEPTOR EN EL INVITE ES: ' + DATA.decode('utf-8'))
+                            write_log(LOG_FILE, 'receive', ip_address_receptor,
+                                      int(port_address_receptor),
+                                      DATA.decode('utf-8'))
                         self.wfile.write(bytes(DATA.decode('utf-8'), 'utf-8'))
                         # write send
-                        write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], DATA.decode('utf-8'))
+                        write_log(LOG_FILE, 'send', self.client_address[0],
+                                  self.client_address[1], DATA.decode('utf-8'))
                     except ConnectionRefusedError:
-                        to_send = ("Error: no server listening at " + ip_address_receptor + " port " + port_address_receptor)
+                        to_send = ("Error: no server listening at " +
+                                   ip_address_receptor + " port " +
+                                   port_address_receptor)
                         print(to_send)
                         write_log(LOG_FILE, 'error', None, None, to_send)
                         to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
                         self.wfile.write(bytes(to_send, 'utf-8'))
                         # write send
-                        write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
-                    # else
+                        write_log(LOG_FILE, 'send', self.client_address[0],
+                                  self.client_address[1], to_send)
                 else:
-                    print('FUUUUUUUCK NO LOS TENGO EN MI DIC')  # COMPROBACION
                     # user not found
                     to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
                     self.wfile.write(bytes(to_send, 'utf-8'))
                     # write send
-                    write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
+                    write_log(LOG_FILE, 'send', self.client_address[0],
+                              self.client_address[1], to_send)
 
             elif (method == 'ACK' or method == 'ack'):
                 method = message.split()[0]
-                print('mlllllllllllllllltodooooooo ' + method)  # COMPROBACION
                 user_emisor = message.split()[1].split(':')[1]
                 # if user in mi dic:
                 if user_emisor in self.dic_users:
                     ip_address_emisor = self.dic_users[user_emisor][0]
                     port_address_emisor = self.dic_users[user_emisor][1]
                     try:
-                        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
-                            my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                            my_socket.connect((ip_address_emisor, int(port_address_emisor)))
+                        with socket.socket(socket.AF_INET,
+                                           socket.SOCK_DGRAM) as my_socket:
+                            my_socket.setsockopt(socket.SOL_SOCKET,
+                                                 socket.SO_REUSEADDR, 1)
+                            my_socket.connect((ip_address_emisor,
+                                              int(port_address_emisor)))
                             my_socket.send(bytes(message, 'utf-8'))
                             # write send
-                            write_log(LOG_FILE, 'send', ip_address_emisor, int(port_address_emisor), message)
+                            write_log(LOG_FILE, 'send', ip_address_emisor,
+                                      int(port_address_emisor), message)
                     except ConnectionRefusedError:
-                        to_send = ("Error: no server listening at " + ip_address_emisor + " port " + port_address_emisor)
+                        to_send = ("Error: no server listening at " +
+                                   ip_address_emisor + " port " +
+                                   port_address_emisor)
                         print(to_send)
                         write_log(LOG_FILE, 'error', None, None, to_send)
                         to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
                         self.wfile.write(bytes(to_send, 'utf-8'))
                         # write send
-                        write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
+                        write_log(LOG_FILE, 'send', self.client_address[0],
+                                  self.client_address[1], to_send)
 
                 else:
-                    print('FUUUUUUUCK NO LOS TENGO EN MI DIC')  # COMPROBACION
                     # user not found
                     to_send = ('SIP/2.0 404 User Not Found\r\n\r\n')
                     self.wfile.write(bytes(to_send, 'utf-8'))
                     # write send
-                    write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
+                    write_log(LOG_FILE, 'send', self.client_address[0],
+                              self.client_address[1], to_send)
 
             else:
                 # metodo no permitido
                 to_send = ('SIP/2.0 405 Method Not Allowed\r\n\r\n')
                 self.wfile.write(bytes(to_send, 'utf-8'))
                 # write send
-                write_log(LOG_FILE, 'send', self.client_address[0], self.client_address[1], to_send)
+                write_log(LOG_FILE, 'send', self.client_address[0],
+                          self.client_address[1], to_send)
 
             print(self.dic_users)
             self.write_database(DB_PATH)

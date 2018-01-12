@@ -186,3 +186,151 @@
 20180111190518 Received from 127.0.0.1:50673: INVITE sip:user2 SIP/2.0 Content-Type: application/sdp  v=0 o=user1 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
 20180111190518 Sent to 127.0.0.1:50673: SIP/2.0 404 User Not Found  
 20180111190655 Finishing.
+20180112125019 Starting...
+20180112125030 Received from 127.0.0.1:50262: REGISTER sip:user1:6038 SIP/2.0 Expires: 3600  
+20180112125030 Sent to 127.0.0.1:50262: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="98923482"  
+20180112125226 Finishing.
+20180112125227 Starting...
+20180112125230 Received from 127.0.0.1:49102: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112125230 Sent to 127.0.0.1:49102: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="37012990"  
+20180112125351 Finishing.
+20180112125352 Starting...
+20180112125353 Received from 127.0.0.1:39774: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112125353 Sent to 127.0.0.1:39774: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="53768879"  
+20180112125649 Finishing.
+20180112125650 Starting...
+20180112125652 Received from 127.0.0.1:59068: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112125652 Sent to 127.0.0.1:59068: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="5004771"  
+20180112125740 Finishing.
+20180112125741 Starting...
+20180112125743 Received from 127.0.0.1:57717: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112125743 Sent to 127.0.0.1:57717: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="17286397"  
+20180112125837 Finishing.
+20180112125838 Starting...
+20180112125840 Received from 127.0.0.1:39737: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112125840 Sent to 127.0.0.1:39737: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="63516350"  
+20180112125907 Finishing.
+20180112125909 Starting...
+20180112125912 Received from 127.0.0.1:42129: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112125912 Sent to 127.0.0.1:42129: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="77817697"  
+20180112130018 Finishing.
+20180112130021 Starting...
+20180112130024 Received from 127.0.0.1:50582: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112130024 Sent to 127.0.0.1:50582: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="48645227"  
+20180112130058 Finishing.
+20180112130059 Starting...
+20180112130101 Received from 127.0.0.1:54566: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112130101 Sent to 127.0.0.1:54566: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="57560261"  
+20180112130114 Finishing.
+20180112130115 Starting...
+20180112130117 Received from 127.0.0.1:43114: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112130117 Sent to 127.0.0.1:43114: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="93392124"  
+20180112130117 Received from 127.0.0.1:43114: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="56e986e8a840dadcf29fcd4f289445ee"  
+20180112130117 Sent to 127.0.0.1:43114: SIP/2.0 200 OK  
+20180112163438 Starting...
+20180112163440 Finishing.
+20180112164121 Starting...
+20180112164127 Received from 127.0.0.1:36085: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112164127 Sent to 127.0.0.1:36085: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="4978500"  
+20180112164127 Received from 127.0.0.1:36085: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="c767a1fd3758b312227738d69d66d48c"  
+20180112164127 Sent to 127.0.0.1:36085: SIP/2.0 200 OK  
+20180112164156 Received from 127.0.0.1:40194: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600  
+20180112164156 Sent to 127.0.0.1:40194: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="13081676"  
+20180112164156 Received from 127.0.0.1:40194: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="a01f6a124019799d712fc291aa834f8d"  
+20180112164156 Sent to 127.0.0.1:40194: SIP/2.0 200 OK  
+20180112164207 Received from 127.0.0.1:40510: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600  
+20180112164207 Sent to 127.0.0.1:40510: SIP/2.0 200 OK  
+20180112164625 Received from 127.0.0.1:37708: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112164625 Sent to 127.0.0.1:6039: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112164625 Error: Error: no server listening at 127.0.0.1 port 6039
+20180112164625 Sent to 127.0.0.1:6038: SIP/2.0 404 User Not Found  
+20180112164752 Received from 127.0.0.1:41403: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112164752 Sent to 127.0.0.1:6039: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112164752 Received from 127.0.0.1:6039: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180112164752 Sent to 127.0.0.1:6038: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180112164752 Received from 127.0.0.1:41403: ACK sip:user2@urjc.es SIP/2.0 
+20180112164752 Sent to 127.0.0.1:6039: ACK sip:user2@urjc.es SIP/2.0 
+20180112164905 Finishing.
+20180112164949 Starting...
+20180112164954 Received from 127.0.0.1:46486: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112164954 Sent to 127.0.0.1:46486: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="1766321"  
+20180112164954 Received from 127.0.0.1:46486: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="e8de42c5301d3346601c9f2274a86cd1"  
+20180112164954 Sent to 127.0.0.1:46486: SIP/2.0 200 OK  
+20180112165000 Received from 127.0.0.1:38807: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600  
+20180112165000 Sent to 127.0.0.1:38807: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="98669439"  
+20180112165000 Received from 127.0.0.1:38807: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="353c4f17122b044da2b4d8994fe0f0c4"  
+20180112165000 Sent to 127.0.0.1:38807: SIP/2.0 200 OK  
+20180112165006 Received from 127.0.0.1:56772: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112165006 Sent to 127.0.0.1:6039: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112165006 Received from 127.0.0.1:6039: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180112165006 Sent to 127.0.0.1:6038: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180112165007 Received from 127.0.0.1:56772: ACK sip:user2@urjc.es SIP/2.0 
+20180112165007 Sent to 127.0.0.1:6039: ACK sip:user2@urjc.es SIP/2.0 
+20180112171043 Finishing.
+20180112171044 Starting...
+20180112171048 Received from 127.0.0.1:34530: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112171122 Finishing.
+20180112171124 Starting...
+20180112171126 Received from 127.0.0.1:59597: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112171126 Sent to 127.0.0.1:59597: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="67421566"  
+20180112171126 Received from 127.0.0.1:59597: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="ba01a586ee7e03fa340231faea79a17b"  
+20180112171126 Sent to 127.0.0.1:59597: SIP/2.0 200 OK  
+20180112171129 Received from 127.0.0.1:59954: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600  
+20180112171129 Sent to 127.0.0.1:59954: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="4914771"  
+20180112171130 Received from 127.0.0.1:59954: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="3b093995a86a42db216368e046c86a86"  
+20180112171130 Sent to 127.0.0.1:59954: SIP/2.0 200 OK  
+20180112171139 Received from 127.0.0.1:44947: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112171139 Sent to 127.0.0.1:6039: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112171139 Received from 127.0.0.1:6039: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180112171139 Sent to 127.0.0.1:6038: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180112171139 Received from 127.0.0.1:44947: ACK sip:user2@urjc.es SIP/2.0 
+20180112171139 Sent to 127.0.0.1:6039: ACK sip:user2@urjc.es SIP/2.0 
+20180112171256 Finishing.
+20180112171258 Starting...
+20180112171300 Received from 127.0.0.1:56837: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112171300 Sent to 127.0.0.1:56837: SIP/2.0 404 User Not Found  
+20180112171306 Received from 127.0.0.1:51715: REGSTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112171306 Sent to 127.0.0.1:51715: SIP/2.0 405 Method Not Allowed  
+20180112171403 Finishing.
+20180112171404 Starting...
+20180112171407 Received from 127.0.0.1:32925: REGSTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112171407 Sent to 127.0.0.1:32925: SIP/2.0 405 Method Not Allowed  
+20180112171412 Finishing.
+20180112171415 Starting...
+20180112171418 Received from 127.0.0.1:50712: REGSTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112171418 Sent to 127.0.0.1:50712: SIP/2.0 405 Method Not Allowed  
+20180112173239 Received from 127.0.0.1:52192: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112173239 Sent to 127.0.0.1:52192: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="57764879"  
+20180112173239 Received from 127.0.0.1:52192: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="555b007746ef95c9813a556b009c4cc9"  
+20180112173239 Sent to 127.0.0.1:52192: SIP/2.0 200 OK  
+20180112181317 Finishing.
+20180112182622 Starting...
+20180112182702 Starting...
+20180112182705 Received from 127.0.0.1:52354: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112182705 Sent to 127.0.0.1:52354: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="37634359"  
+20180112182705 Received from 127.0.0.1:52354: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="daac01313cefb86010d2999ea4b2fb44"  
+20180112182705 Sent to 127.0.0.1:52354: SIP/2.0 200 OK  
+20180112182714 Received from 127.0.0.1:44598: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600  
+20180112182714 Sent to 127.0.0.1:44598: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="88625299"  
+20180112182714 Received from 127.0.0.1:44598: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="1d9dd4efbad209d84eeb36fa7f032852"  
+20180112182714 Sent to 127.0.0.1:44598: SIP/2.0 200 OK  
+20180112183259 Finishing.
+20180112183259 Starting...
+20180112184223 Finishing.
+20180112184358 Starting...
+20180112184811 Finishing.
+20180112184812 Starting...
+20180112184815 Received from 127.0.0.1:45394: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600  
+20180112184815 Sent to 127.0.0.1:45394: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="38169158"  
+20180112184815 Received from 127.0.0.1:45394: REGISTER sip:user1@urjc.es:6038 SIP/2.0 Expires: 3600 Authorization: Digest response="ac9736fd48c9d8010aa66dacd2ec489d"  
+20180112184815 Sent to 127.0.0.1:45394: SIP/2.0 200 OK  
+20180112184820 Received from 127.0.0.1:48192: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600  
+20180112184820 Sent to 127.0.0.1:48192: SIP/2.0 401 Unauthorized WWW-Authenticate: Digest nonce="68521945"  
+20180112184820 Received from 127.0.0.1:48192: REGISTER sip:user2@urjc.es:6039 SIP/2.0 Expires: 3600 Authorization: Digest response="c69e945c18c919303aa9016292232dfc"  
+20180112184820 Sent to 127.0.0.1:48192: SIP/2.0 200 OK  
+20180112184833 Received from 127.0.0.1:52807: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112184833 Sent to 127.0.0.1:6039: INVITE sip:user2@urjc.es SIP/2.0 Content-Type: application/sdp  v=0 o=user1@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7001 RTP  
+20180112184833 Received from 127.0.0.1:6039: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180112184833 Sent to 127.0.0.1:6038: SIP/2.0 100 Trying  SIP/2.0 180 Ringing  SIP/2.0 200 OK Content-Type: application/sdp  v=0 o=user2@urjc.es 127.0.0.1 s=misesion t=0 m=audio 7002 RTP 
+20180112184833 Received from 127.0.0.1:52807: ACK sip:user2@urjc.es SIP/2.0 
+20180112184833 Sent to 127.0.0.1:6039: ACK sip:user2@urjc.es SIP/2.0 
