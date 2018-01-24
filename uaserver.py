@@ -5,11 +5,10 @@ Class (and main program) of the uaserver
 """
 
 import os
-import socket
 import socketserver
 import sys
 from uaclient import UAClientHandler, write_log
-from proxy_registrar import error, correct_ip, correct_port
+from proxy_registrar import error
 
 
 class UAServerHandler(socketserver.DatagramRequestHandler):
@@ -19,17 +18,17 @@ class UAServerHandler(socketserver.DatagramRequestHandler):
     LISTA = ['INVITE', 'ACK', 'BYE']
     dic_rtp = {}
 
-    def look_for(self, ip):
+    def look_for(self, address):
         """
         method to look for the port of user
         """
         for user in self.dic_rtp:
-            print(user)
-            if ip == user:
+            print(user)  # Comprobacion, no haria falta
+            if address == user:
                 port = self.dic_rtp[user]
+                del self.dic_rtp[user]  # cambiado de lugar, a ver si va
                 break
         return port
-        del self.dic_rtp[user]
 
     def handle(self):
         """
@@ -44,7 +43,7 @@ class UAServerHandler(socketserver.DatagramRequestHandler):
             method = message.split()[0]
             # write receive
             write_log(LOG_FILE, 'receive', IP_PROXY, PORT_PROXY, message)
-            if error(message.split()):  
+            if error(message.split()):
                 self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
             elif method == 'INVITE' or method == 'invite':
                 ip_emisor = message.split()[7]
@@ -93,7 +92,7 @@ if __name__ == "__main__":
     CONFIG = sys.argv[1]
     if not os.path.exists(CONFIG):
         sys.exit("Config_file doesn't exists")
-    print(UAClientHandler.elparser(CONFIG))
+    print(UAClientHandler.elparser(CONFIG))  # comprobacion, no haria falta
     if UAClientHandler.config["regproxy_ip"] is None:
         IP_PROXY = "127.0.0.1"
     else:

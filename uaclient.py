@@ -33,14 +33,14 @@ class UAClientHandler(ContentHandler):
                 self.config[name + "_" + atributo] = attrs.get(atributo, "")
 
     def get_tags(self):
-        return(self.config)
+        return self.config
 
     def elparser(fich):
         parser = make_parser()
-        uaHandler = UAClientHandler()
-        parser.setContentHandler(uaHandler)
+        ua_handler = UAClientHandler()
+        parser.setContentHandler(ua_handler)
         parser.parse(open(fich))
-        return(uaHandler.get_tags())
+        return ua_handler.get_tags()
 
 
 def checking(nonce):
@@ -55,7 +55,7 @@ def checking(nonce):
     return function_check.hexdigest()
 
 
-def write_log(fichero, metodo, ip, port, message):
+def write_log(fichero, metodo, address, port, message):
     """
     method to write log
     """
@@ -64,10 +64,10 @@ def write_log(fichero, metodo, ip, port, message):
     if metodo == 'open':
         line = (current_hour + " Starting...")
     elif metodo == 'send':
-        line = (current_hour + " Sent to " + ip + ':' + str(port) + ': ' +
+        line = (current_hour + " Sent to " + address + ':' + str(port) + ': ' +
                 message.replace('\r\n', ' '))
     elif metodo == 'receive':
-        line = (current_hour + " Received from " + ip + ':' + str(port) +
+        line = (current_hour + " Received from " + address + ':' + str(port) +
                 ': ' + message.replace('\r\n', ' '))
     elif metodo == 'error':
         line = (current_hour + " Error: " + message.replace('\r\n', ' '))
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     if METHOD not in LISTA:
         sys.exit('SIP/2.0 405 Method Not Allowed\r\n')
     OPCION = sys.argv[3]
-    print(UAClientHandler.elparser(CONFIG))
+    print(UAClientHandler.elparser(CONFIG))  # comprobacion, no haria falta
 
     # Doy valor a las variables segun la info del xml
     if UAClientHandler.config["regproxy_ip"] is None:
@@ -104,7 +104,6 @@ if __name__ == "__main__":
     IP_UASERVER = UAClientHandler.config['uaserver_ip']
     PORT_UASERVER = int(UAClientHandler.config['uaserver_puerto'])
     RTPAUDIO = UAClientHandler.config['rtpaudio_puerto']
-    print('EL PUERTO DONDE ESPERO RECIBIR RTP EEEEEEEEEEEEEEEEES: ' + RTPAUDIO)
     AUDIO_FILE = UAClientHandler.config['audio_path']
     LOG_FILE = UAClientHandler.config['log_path']
 
@@ -116,14 +115,14 @@ if __name__ == "__main__":
         # write starting
         write_log(LOG_FILE, 'open', None, None, None)
         if METHOD == 'REGISTER':
-            to_send = (METHOD + ' sip:' + USER + ':' + str(PORT_UASERVER) +
+            TO_SEND = (METHOD + ' sip:' + USER + ':' + str(PORT_UASERVER) +
                        ' SIP/2.0\r\nExpires: ' + OPCION + '\r\n')
-            my_socket.send(bytes(to_send, 'utf-8') + b'\r\n')
+            my_socket.send(bytes(TO_SEND, 'utf-8') + b'\r\n')
             # write send
-            write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
+            write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, TO_SEND)
 
         elif METHOD == 'INVITE':
-            to_send = (METHOD + ' sip:' + OPCION +
+            TO_SEND = (METHOD + ' sip:' + OPCION +
                        ' SIP/2.0\r\nContent-Type: application/sdp' +
                        '\r\n\r\n' +
                        'v=0\r\n' +
@@ -131,21 +130,20 @@ if __name__ == "__main__":
                        's=misesion\r\n' +
                        't=0\r\n' +
                        'm=audio ' + RTPAUDIO + ' RTP\r\n')
-            my_socket.send(bytes(to_send, 'utf-8') + b'\r\n')
+            my_socket.send(bytes(TO_SEND, 'utf-8') + b'\r\n')
             # write send
-            write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
+            write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, TO_SEND)
 
         elif METHOD == 'BYE':
-            to_send = (METHOD + ' sip:' + OPCION + ' SIP/2.0\r\n')
-            my_socket.send(bytes(to_send, 'utf-8') + b'\r\n')
+            TO_SEND = (METHOD + ' sip:' + OPCION + ' SIP/2.0\r\n')
+            my_socket.send(bytes(TO_SEND, 'utf-8') + b'\r\n')
             # write send
-            write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
+            write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, TO_SEND)
 
         try:
             DATA = my_socket.recv(1024)
             print('Recibido -- ' + DATA.decode('utf-8'))
             MESSAGE_RECEIVE = DATA.decode('utf-8').split()
-            print('UEEEEEEEEEEEEEEEEEEEEEE: ' + DATA.decode('utf-8'))
 
             if MESSAGE_RECEIVE:
                 # write receive
@@ -154,38 +152,38 @@ if __name__ == "__main__":
 
             if MESSAGE_RECEIVE and MESSAGE_RECEIVE[1] == '100':  # 100-180-200
                 # cojo ip y puerto
-                user_receptor = MESSAGE_RECEIVE[12].split('=')[1]
-                ip_receptor = MESSAGE_RECEIVE[13]
-                port_receptor = MESSAGE_RECEIVE[17]
+                USER_RECEPTOR = MESSAGE_RECEIVE[12].split('=')[1]
+                IP_RECEPTOR = MESSAGE_RECEIVE[13]
+                PORT_RECEPTOR = MESSAGE_RECEIVE[17]
                 # write receive
                 write_log(LOG_FILE, 'receive', IP_PROXY, PORT_PROXY,
                           DATA.decode('utf-8'))
                 # mando ack
-                to_send = ('ACK sip:' + user_receptor + ' SIP/2.0\r\n')
-                my_socket.send(bytes(to_send, 'utf-8'))
+                TO_SEND = ('ACK sip:' + USER_RECEPTOR + ' SIP/2.0\r\n')
+                my_socket.send(bytes(TO_SEND, 'utf-8'))
                 # write send
-                write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
+                write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, TO_SEND)
                 # abro socket con el otro y mando rtp
-                a_ejecutar = ('./mp32rtp -i ' + ip_receptor + ' -p ' +
-                              port_receptor + ' < ' + AUDIO_FILE)
-                print('Vamos a ejecutar', a_ejecutar)
-                os.system(a_ejecutar)
+                A_EJECUTAR = ('./mp32rtp -i ' + IP_RECEPTOR + ' -p ' +
+                              PORT_RECEPTOR + ' < ' + AUDIO_FILE)
+                print('Vamos a ejecutar', A_EJECUTAR)
+                os.system(A_EJECUTAR)
                 print('creo que ya se ha acabado')
                 # write send
-                write_log(LOG_FILE, 'send', ip_receptor, port_receptor,
-                          ('Vamos a ejecutar' + a_ejecutar))
+                write_log(LOG_FILE, 'send', IP_RECEPTOR, PORT_RECEPTOR,
+                          ('Vamos a ejecutar' + A_EJECUTAR))
 
             elif MESSAGE_RECEIVE and MESSAGE_RECEIVE[1] == '401':
-                nonce = MESSAGE_RECEIVE[5].split('=')[1][1:-1]
-                response = checking(nonce)
-                to_send = ('REGISTER sip:' + USER + ':' +
+                VALIDATION = MESSAGE_RECEIVE[5].split('=')[1][1:-1]
+                RESPONSE = checking(VALIDATION)
+                TO_SEND = ('REGISTER sip:' + USER + ':' +
                            str(PORT_UASERVER) + ' SIP/2.0\r\nExpires: ' +
                            OPCION + '\r\n' +
                            'Authorization: Digest response="' +
-                           response + '"\r\n\r\n')
-                my_socket.send(bytes(to_send, 'utf-8'))
+                           RESPONSE + '"\r\n\r\n')
+                my_socket.send(bytes(TO_SEND, 'utf-8'))
                 # write send
-                write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, to_send)
+                write_log(LOG_FILE, 'send', IP_PROXY, PORT_PROXY, TO_SEND)
                 # Espero recibir el 200ok
                 my_socket.connect((IP_PROXY, PORT_PROXY))
                 DATA = my_socket.recv(1024)
@@ -206,10 +204,10 @@ if __name__ == "__main__":
 
         except ConnectionRefusedError:
             # write error
-            to_send = ("Error: no server listening at " + IP_PROXY +
+            TO_SEND = ("Error: no server listening at " + IP_PROXY +
                        " port " + str(PORT_PROXY))
-            write_log(LOG_FILE, 'error', None, None, to_send)
-            exit(to_send)
+            write_log(LOG_FILE, 'error', None, None, TO_SEND)
+            exit(TO_SEND)
 
     print("Fin.")
     # write fin

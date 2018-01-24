@@ -5,16 +5,15 @@ Class (and main program) of the proxy-register server
 """
 
 import hashlib
-import json
 import os
 import random
 import socket
 import socketserver
 import sys
 import time
-from uaclient import write_log
 from xml.sax import make_parser
 from xml.sax.handler import ContentHandler
+from uaclient import write_log
 
 
 class ProxyHandler(ContentHandler):
@@ -34,14 +33,14 @@ class ProxyHandler(ContentHandler):
                 self.config[name + "_" + atributo] = attrs.get(atributo, "")
 
     def get_tags(self):
-        return (self.config)
+        return self.config
 
     def elparser(fich):
         parser = make_parser()
-        prHandler = ProxyHandler()
-        parser.setContentHandler(prHandler)
+        pr_handler = ProxyHandler()
+        parser.setContentHandler(pr_handler)
         parser.parse(open(fich))
-        return(prHandler.get_tags())
+        return pr_handler.get_tags()
 
 
 def fich_passwords(user):
@@ -77,23 +76,15 @@ def error(line):  # para el extra del error 400
     fail = False
     try:
         if line[1][0:4] != 'sip:':
-            print(line[1][0:4])
             fail = True
-            print('1')
         if '@' not in line[1]:
-            print(line[1])
             fail = True
-            print('2')
         if ':' not in line[1]:
             fail = True
-            print('3')
         if 'SIP/2.0' not in line:
-            print(line)
             fail = True
-            print('4')
     except IndexError:
         fail = True
-        print('5')
     return fail
 
 
@@ -146,7 +137,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
             if error(message.split()):
                 self.wfile.write(b"SIP/2.0 400 Bad Request\r\n\r\n")
 
-            elif (method == 'REGISTER' or method == 'register'):
+            elif method == 'REGISTER' or method == 'register':
                 user = message.split()[1].split(':')[1]
                 ip_address = self.client_address[0]
                 port_address = message.split()[1].split(':')[2]  # uaserver
@@ -187,7 +178,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                                                             time_regist,
                                                             expire]
                                     # subo a base de datos
-                                    self.write_database(DB_PATH)
+                                    #self.write_database(DB_PATH)PROBAR A VER SI VA O NO VA
                                     # envío 200ok
                                     to_send = ('SIP/2.0 200 OK\r\n\r\n')
                                     self.wfile.write(bytes(to_send, 'utf-8'))
@@ -221,7 +212,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                         write_log(LOG_FILE, 'send', ip_address,
                                   self.client_address[1], to_send)
 
-            elif (method == 'INVITE' or method == 'invite'):
+            elif method == 'INVITE' or method == 'invite':
                 # miro en mi dic si usuario emisor y receptor están
                 user_emisor = message.split()[6].split('=')[1]
                 user_receptor = message.split()[1].split(':')[1]
@@ -274,7 +265,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                     write_log(LOG_FILE, 'send', self.client_address[0],
                               self.client_address[1], to_send)
 
-            elif (method == 'BYE' or method == 'bye'):
+            elif method == 'BYE' or method == 'bye':
                 method = message.split()[0]
                 # miro en mi dic si usuario está
                 user_receptor = message.split()[1].split(':')[1]
@@ -320,7 +311,7 @@ class ProxyRegisterHandler(socketserver.DatagramRequestHandler):
                     write_log(LOG_FILE, 'send', self.client_address[0],
                               self.client_address[1], to_send)
 
-            elif (method == 'ACK' or method == 'ack'):
+            elif method == 'ACK' or method == 'ack':
                 method = message.split()[0]
                 user_emisor = message.split()[1].split(':')[1]
                 # if user in mi dic:
@@ -375,7 +366,7 @@ if __name__ == "__main__":
     CONFIG = sys.argv[1]
     if not os.path.exists(CONFIG):
         sys.exit("Config_file doesn't exists")
-    print(ProxyHandler.elparser(CONFIG))
+    print(ProxyHandler.elparser(CONFIG))  # comprobacion, no hace falta
 
     # Doy valor a las variables segun la info del xml
     if ProxyHandler.config["server_ip"] is None:
